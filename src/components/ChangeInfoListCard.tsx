@@ -1,33 +1,71 @@
-import { useAtomValue } from "jotai";
-import { filteredChangeInfoListAtom } from "../store";
+import { PrimitiveAtom, useAtom, useAtomValue } from "jotai";
+import { changeInfoAtomsAtom, jenkinsBuildInfoAtom } from "@/src/store";
+import { Checkbox } from "@/src/components/ui/checkbox";
+import { GerritChangeInfo } from "../types";
+import { Button } from "./ui/button";
 
 export const ChangeInfoListCard = () => {
-	const filteredChangeInfoList = useAtomValue(filteredChangeInfoListAtom);
+	const [itemAtoms] = useAtom(changeInfoAtomsAtom);
+	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
 
-	if (!filteredChangeInfoList || filteredChangeInfoList.length <= 0) {
+	if (!itemAtoms || itemAtoms.length <= 0) {
 		return null;
 	}
 
+	const handleBuild = () => {
+		console.log("handleClick", jenkinsBuildInfo);
+	};
+
 	return (
-		<div>
-			<ul>
-				{filteredChangeInfoList.map((changeInfo) => {
-					const shortRevision = changeInfo.current_revision.substring(0, 6);
-					return (
-						<li key={changeInfo.current_revision} className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
-							<div className="flex items-center">
-								<input
-									id={`checkbox-${changeInfo.current_revision}`}
-									type="checkbox"
-									value={""}
-                                    onChange={e=>console.log(e.target.value)}
-								/>
-								<label>{shortRevision}</label>
-							</div>
-						</li>
-					);
+		<div className="mt-4">
+			<ul className="flex flex-col gap-2">
+				{itemAtoms.map((item) => {
+					return <ChangeInfoItem itemAtom={item} key={item.toString()} />;
 				})}
 			</ul>
+			<div className="mt-2">
+				<Button onClick={handleBuild}>Build</Button>
+			</div>
 		</div>
+	);
+};
+
+const ChangeInfoItem = ({
+	itemAtom,
+}: {
+	itemAtom: PrimitiveAtom<GerritChangeInfo>;
+}) => {
+	const [item, setItem] = useAtom(itemAtom);
+
+	const checkboxId = `checkbox-${item.current_revision}`;
+
+	return (
+		<li className="rounded-md border p-2 shadow flex justify-between items-center">
+			<div className="items-top flex space-x-2">
+				<Checkbox
+					id={checkboxId}
+					checked={item.isSelected}
+					onClick={() =>
+						setItem((prev) => ({ ...prev, isSelected: !prev.isSelected }))
+					}
+				/>
+				<div className="grid gap-1.5 leading-none">
+					<label
+						htmlFor={checkboxId}
+						className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 truncate"
+					>
+						{item.subject}
+					</label>
+					<div className="w-14">
+						<p className="text-sm text-muted-foreground text-ellipsis overflow-hidden">
+							{item.current_revision}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div>
+				<p>{item.project}</p>
+			</div>
+		</li>
 	);
 };

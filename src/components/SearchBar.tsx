@@ -14,19 +14,41 @@ export const SearchBar = () => {
 	const setGerritChangeList = useSetAtom(changeInfoListAtom);
 
 	const onSubmit: SubmitHandler<SearchForm> = (data) => {
-		setGerritChangeList([{
-			current_revision: "1111111111",
-			project: "webui"
-		}, {
-			current_revision: "2222222222",
-			project: "jl"
-		}])
+		setGerritChangeList([
+			{
+				current_revision: "1111111111",
+				project: "webui",
+				subject: "USER-111 XXX",
+			},
+			{
+				current_revision: "2222222222",
+				project: "jl",
+				subject: "USER-222 XXX",
+				isSelected: true
+			},
+		]);
 		// getGerritAccessTokenFromCookie().then((accessToken) => {
 		// 	getGerritChangeInfosByTopic({
 		// 		topic: data.topic,
 		// 		accessToken,
 		// 	}).then((changeInfos) => {
-		// 		setGerritChangeList(changeInfos);
+		// 		const sorted = changeInfos.sort((a, b) => {
+		// 			if (a.project < b.project) {
+		// 				return -1;
+		// 			}
+		// 			if (a.project > b.project) {
+		// 				return 1;
+		// 			}
+		// 			return 0;
+		// 		});
+		// 		const initSelectedProjects: string[] = [];
+		// 		sorted.forEach((changeInfo) => {
+		// 			if (!initSelectedProjects.includes(changeInfo.project)) {
+		// 				changeInfo.isSelected = true;
+		// 				initSelectedProjects.push(changeInfo.project);
+		// 			}
+		// 		});
+		// 		setGerritChangeList(sorted);
 		// 	});
 		// });
 	};

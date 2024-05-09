@@ -1,7 +1,7 @@
 import { PrimitiveAtom, useAtom, useAtomValue } from "jotai";
 import { changeInfoAtomsAtom, jenkinsBuildInfoAtom } from "@/src/store";
 import { Checkbox } from "@/src/components/ui/checkbox";
-import { GerritChangeInfo } from "../types";
+import { GerritChangeInfo, JenkinsBuildInfo } from "../types";
 import { Button } from "./ui/button";
 
 export const ChangeInfoListCard = () => {
@@ -13,7 +13,7 @@ export const ChangeInfoListCard = () => {
 	}
 
 	const handleBuild = () => {
-		console.log("handleClick", jenkinsBuildInfo);
+		fillJenkinsBuildForm(jenkinsBuildInfo);
 	};
 
 	return (
@@ -69,3 +69,33 @@ const ChangeInfoItem = ({
 		</li>
 	);
 };
+
+const fillJenkinsBuildForm = (jenkinsBuildInfo: JenkinsBuildInfo) => {
+	console.log("handleClick", jenkinsBuildInfo);
+
+	chrome.tabs
+		.query({
+			active: true,
+			url: "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/*",
+		})
+		.then((tabs) => {
+			console.log(tabs);
+		});
+};
+
+/**
+  var nodes = document.querySelectorAll('input[value="ADMIN_UI_IMAGE_TAG"]');
+  var field = nodes[0];
+  field.nextElementSibling.value="123";
+
+// chrome.scripting.executeScript({
+		// 	target: { tabId: 437564020 },
+		// 	func: () =>
+		// 		console.log(
+		// 			"changes",
+		// 			console.log(document.getElementsByName("BUILD_DESCRIPTION"))
+		// 		),
+		// });
+
+
+ */

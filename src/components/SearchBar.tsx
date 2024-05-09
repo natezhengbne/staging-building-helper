@@ -21,9 +21,14 @@ export const SearchBar = () => {
 				subject: "USER-111 XXX",
 			},
 			{
-				current_revision: "2222222222",
+				current_revision: "22222222",
+				project: "webui",
+				subject: "USER-222 YYY",
+			},
+			{
+				current_revision: "333333333",
 				project: "jl",
-				subject: "USER-222 XXX",
+				subject: "USER-3333 XXX",
 				isSelected: true
 			},
 		]);

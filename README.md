@@ -1,30 +1,26 @@
-# React + TypeScript + Vite
+# Jenkins Pipeline Building Form Helper - Chrome Extension
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This Chrome extension simplifies filling the image tag in Jenkins pipeline building forms by leveraging topic searches in Gerrit.
 
-Currently, two official plugins are available:
+## Features:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Input a topic in the search bar.
+- Select the desired patch from the search results.
+- Click a button to automatically populate the image revision field in the Jenkins page with the selected patch's image revision.
 
-## Expanding the ESLint configuration
+## Installation:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Download the extension.
+Go to chrome://extensions in your Chrome browser.
+Enable "Developer mode" in the top-right corner.
+Load the unpacked extension.
 
-- Configure the top-level `parserOptions` property like this:
+## Example:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+Imagine you're building a pipeline and need to specify several image revisions based on Gerrit patches related to the topic "expand-248-uk-address-lookup"
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+- Open the gerrit page.
+- Open the Jenkins pipeline building page.
+- In the extension's search bar, type "expand-248-uk-address-lookup."
+- Select the appropriate patch from the search results.
+- Click the extension button.

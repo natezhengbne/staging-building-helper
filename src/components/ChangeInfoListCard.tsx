@@ -114,9 +114,7 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 	);
 };
 
-const fillJenkinsBuildForm = (jenkinsBuildInfo: JenkinsBuildInfo) => {
-	console.log("handleClick", jenkinsBuildInfo);
-
+const fillJenkinsBuildForm = async (jenkinsBuildInfo: JenkinsBuildInfo) => {
 	chrome.tabs
 		.query({
 			active: true,
@@ -125,21 +123,40 @@ const fillJenkinsBuildForm = (jenkinsBuildInfo: JenkinsBuildInfo) => {
 		.then((tabs) => {
 			console.log(tabs);
 		});
+
+	const jenkinsTabs = await chrome.tabs.query({
+		active: true,
+		url: "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/*",
+	});
+
+	if (!jenkinsTabs || jenkinsTabs.length <= 0) {
+		return Promise.reject();
+	}
+
+	const jenkinsTab = jenkinsTabs[0];
+
+	if (!jenkinsTab || !jenkinsTab.id) {
+		return Promise.reject();
+	}
+
+	await chrome.scripting.executeScript({
+		target: { tabId: jenkinsTab.id },
+		func: runImagesTagsScript,
+		args: [jenkinsBuildInfo],
+	});
 };
 
-/**
-  var nodes = document.querySelectorAll('input[value="ADMIN_UI_IMAGE_TAG"]');
-  var field = nodes[0];
-  field.nextElementSibling.value="123";
-
-// chrome.scripting.executeScript({
-		// 	target: { tabId: 437564020 },
-		// 	func: () =>
-		// 		console.log(
-		// 			"changes",
-		// 			console.log(document.getElementsByName("BUILD_DESCRIPTION"))
-		// 		),
-		// });
-
-
- */
+const runImagesTagsScript = (jenkinsBuildInfo: JenkinsBuildInfo) => {
+	jenkinsBuildInfo.imageTags.forEach((imageTag) => {
+		const nodes = document.querySelectorAll(
+			`input[value="${imageTag.fieldLabel}"]`
+		);
+		if (nodes && nodes.length > 0) {
+			const field = nodes[0];
+			const inputField = field.nextElementSibling as HTMLInputElement;
+			if (inputField) {
+				inputField.value = imageTag.tag;
+			}
+		}
+	});
+};

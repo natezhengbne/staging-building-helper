@@ -17,7 +17,7 @@ export type SelectedRevisions = {
 }
 
 export type JenkinsImageTag = {
-	project: string;
+	fieldLabel: string;
 	tag: string;
 };
 

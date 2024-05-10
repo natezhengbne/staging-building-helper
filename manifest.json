@@ -6,8 +6,8 @@
         "default_popup": "index.html"
     },
     "host_permissions": [
-        "http://*/*",
-        "https://*/*"
+        "https://*.dev.benon.com/*",
+        "http://*.dev.benon.com/*"
     ],
     "permissions": [
         "cookies",

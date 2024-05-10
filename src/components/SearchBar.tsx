@@ -4,6 +4,8 @@ import { useSetAtom } from "jotai";
 import { changeInfoProjectsAtom } from "@/src/store";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
+import { gerritChangeInfoProjectsData } from "../fixture";
+import { useState } from "react";
 
 type SearchForm = {
 	topic: string;
@@ -16,35 +18,56 @@ type SearchForm = {
 export const SearchBar = () => {
 	const { register, handleSubmit } = useForm<SearchForm>();
 	const setChangeInfoProjects = useSetAtom(changeInfoProjectsAtom);
+	const [error, setError] = useState("");
 
 	const onSubmit: SubmitHandler<SearchForm> = (data) => {
+		setError("");
 		// setChangeInfoProjects(gerritChangeInfoProjectsData);
-		getGerritAccessTokenFromCookie().then((accessToken) => {
-			getGerritChangeInfosByTopic({
-				topic: data.topic,
-				accessToken,
-			}).then((changeInfos) => {
-				const changeInfoProjects: GerritChangeInfoProjects = {};
+		getGerritAccessTokenFromCookie()
+			.then((accessToken) => {
+				getGerritChangeInfosByTopic({
+					topic: data.topic,
+					accessToken,
+				})
+					.then((changeInfos) => {
+						if (!changeInfos || changeInfos.length === 0) {
+							return Promise.reject("Non results returned");
+						}
+						const changeInfoProjects: GerritChangeInfoProjects = {};
 
-				changeInfos.forEach((changeInfo) => {
-					const project = changeInfoProjects[changeInfo.project];
-					if (project) {
-						project.push(changeInfo);
-					} else {
-						changeInfoProjects[changeInfo.project] = [changeInfo];
-					}
-				});
-				setChangeInfoProjects(changeInfoProjects);
-			});
-		});
+						changeInfos.forEach((changeInfo) => {
+							const project = changeInfoProjects[changeInfo.project];
+							if (project) {
+								project.push(changeInfo);
+							} else {
+								changeInfoProjects[changeInfo.project] = [changeInfo];
+							}
+						});
+						setChangeInfoProjects(changeInfoProjects);
+					})
+					.catch((err: string) => setError(err ?? "Gerrit query failed"));
+			})
+			.catch(() => setError("The Gerrit access token is unreachable"));
 	};
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} autoComplete="off" autoFocus>
-			<div className="flex w-full max-w-sm items-center space-x-2">
-				<Input {...register("topic")} placeholder="Topic" required />
-				<Button type="submit">Search</Button>
+			<div className="flex w-full items-center space-x-2">
+				<Input
+					{...register("topic")}
+					placeholder="Topic"
+					required
+					onFocus={() => setError("")}
+				/>
+				<Button type="submit" className="bg-indigo-500">
+					Search
+				</Button>
 			</div>
+			{error && (
+				<div className="p-2 text-red-600 text-sm">
+					<p>{error}</p>
+				</div>
+			)}
 		</form>
 	);
 };

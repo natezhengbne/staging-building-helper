@@ -5,7 +5,6 @@ export type GerritChangeInfo = {
 	project: string;
 	status?: string;
 	current_revision: string;
-	isSelected?: boolean;
 };
 
 export type GerritChangeInfoProjects = {
@@ -22,5 +21,7 @@ export type JenkinsImageTag = {
 };
 
 export type JenkinsBuildInfo = {
+	site?: string;
+	cluster?: string;
 	imageTags: JenkinsImageTag[];
 };

@@ -5,9 +5,14 @@ import {
 	selectedRevisionsAtom,
 } from "@/src/store";
 import { Checkbox } from "@/src/components/ui/checkbox";
-import { GerritChangeInfo, JenkinsBuildInfo } from "../types";
-import { Button } from "./ui/button";
-export const ChangeInfoListCard = () => {
+import { GerritChangeInfo, JenkinsBuildInfo } from "@/src/types";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "./ui/badge";
+import { SiteCard } from "./SiteCard";
+import { Separator } from "@/src/components/ui/separator";
+import { ClusterNameCard } from "./ClusterNameCard";
+
+export const JenkinsBuildCard = () => {
 	const projects = useAtomValue(changeInfoProjectsAtom);
 	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
 
@@ -15,7 +20,7 @@ export const ChangeInfoListCard = () => {
 		return null;
 	}
 
-	const handleBuild = () => {
+	const handlePrefill = () => {
 		fillJenkinsBuildForm(jenkinsBuildInfo);
 	};
 
@@ -34,8 +39,12 @@ export const ChangeInfoListCard = () => {
 					);
 				})}
 			</ul>
-			<div className="mt-2">
-				<Button onClick={handleBuild}>Build</Button>
+			<Separator className="my-3" />
+			<SiteCard />
+			<Separator className="my-3" />
+			<ClusterNameCard />
+			<div className="mt-3">
+				<Button size="sm" className="bg-indigo-500" onClick={handlePrefill}>Prefill</Button>
 			</div>
 		</div>
 	);
@@ -50,8 +59,11 @@ const ProjectChangeInfoItems = (props: ProjectChangeInfoItemsProps) => {
 	const { changeInfos, projectName } = props;
 
 	return (
-		<li className="rounded-md border p-2 shadow flex justify-between items-center">
-			<div>
+		<div>
+			<Badge className="rounded-none" variant="secondary">
+				{projectName}
+			</Badge>
+			<li className="rounded-none border p-2 shadow flex flex-col gap-y-1">
 				{changeInfos.map((changeInfo) => {
 					return (
 						<ChangeInfoItem
@@ -60,11 +72,8 @@ const ProjectChangeInfoItems = (props: ProjectChangeInfoItemsProps) => {
 						/>
 					);
 				})}
-			</div>
-			<div>
-				<p>{projectName}</p>
-			</div>
-		</li>
+			</li>
+		</div>
 	);
 };
 
@@ -97,15 +106,15 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 				checked={isSelected}
 				onCheckedChange={handleClick}
 			/>
-			<div className="grid gap-1.5 leading-none">
+			<div className="grid">
 				<label
 					htmlFor={checkboxId}
-					className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 truncate"
+					className="text-xs font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 truncate"
 				>
 					{changeInfo.subject}
 				</label>
-				<div className="w-14">
-					<p className="text-sm text-muted-foreground text-ellipsis overflow-hidden">
+				<div className="w-14 self-center">
+					<p className="text-xs text-muted-foreground text-ellipsis overflow-hidden">
 						{changeInfo.current_revision}
 					</p>
 				</div>
@@ -152,4 +161,30 @@ const runImagesTagsScript = (jenkinsBuildInfo: JenkinsBuildInfo) => {
 			}
 		}
 	});
+
+	if (jenkinsBuildInfo.site) {
+		const nodes = document.querySelectorAll(`input[value="POWERED_BY_JUMBO"]`);
+		if (nodes && nodes.length > 0) {
+			const field = nodes[0];
+			const inputField = field.nextElementSibling as HTMLInputElement;
+			if (inputField) {
+				inputField.value = jenkinsBuildInfo.site;
+				// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
+				inputField.style = "color: white; background-color: blue";
+			}
+		}
+	}
+
+	if (jenkinsBuildInfo.cluster) {
+		const nodes = document.querySelectorAll(`input[value="CLUSTER_NAME"]`);
+		if (nodes && nodes.length > 0) {
+			const field = nodes[0];
+			const inputField = field.nextElementSibling as HTMLInputElement;
+			if (inputField) {
+				inputField.value = jenkinsBuildInfo.cluster;
+				// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
+				inputField.style = "color: white; background-color: blue";
+			}
+		}
+	}
 };

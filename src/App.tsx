@@ -1,11 +1,11 @@
 import { SearchBar } from "./components/SearchBar";
-import { ChangeInfoListCard } from "./components/ChangeInfoListCard";
+import { JenkinsBuildCard } from "./components/JenkinsBuildCard";
 
 function App() {
 	return (
-		<div className="w-screen max-w-screen-lg p-2 bg-amber-50">
+		<div className="w-screen max-w-screen-md p-2 bg-amber-50">
 			<SearchBar />
-			<ChangeInfoListCard />
+			<JenkinsBuildCard />
 		</div>
 	);
 }

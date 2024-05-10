@@ -9,6 +9,9 @@ import {
 export const changeInfoProjectsAtom = atom<GerritChangeInfoProjects>({});
 
 export const selectedRevisionsAtom = atom<SelectedRevisions>({});
+export const selectedSiteAtom = atom<string>("ozl");
+export const selectedClusterNameAtom = atom<string>("");
+export const selectedClusterIdAtom = atom<string>("");
 
 export const jenkinsBuildInfoAtom = atom<JenkinsBuildInfo>((get) => {
 	const selectedRevisions = get(selectedRevisionsAtom);
@@ -24,8 +27,18 @@ export const jenkinsBuildInfoAtom = atom<JenkinsBuildInfo>((get) => {
 		}
 	);
 
+	const selectedSite = get(selectedSiteAtom);
+	const selectedClusterName = get(selectedClusterNameAtom);
+	const selectedClusterId = get(selectedClusterIdAtom);
+	const cluster =
+		selectedClusterName && selectedClusterId
+			? selectedClusterName.concat(selectedClusterId)
+			: "";
+
 	return {
 		imageTags,
+		site: selectedSite,
+		cluster,
 	};
 });
 

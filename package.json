@@ -15,6 +15,8 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "jotai": "^2.8.0",
+    "jotai-optics": "^0.3.2",
+    "optics-ts": "^2.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.4"

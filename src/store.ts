@@ -1,21 +1,26 @@
 import { atom } from "jotai";
-import { GerritChangeInfo, JenkinsBuildInfo, JenkinsImageTag } from "./types";
-import { splitAtom } from "jotai/utils";
+import {
+	GerritChangeInfoProjects,
+	JenkinsBuildInfo,
+	JenkinsImageTag,
+	SelectedRevisions,
+} from "@/src/types";
 
-export const changeInfoListAtom = atom<GerritChangeInfo[]>([]);
+export const changeInfoProjectsAtom = atom<GerritChangeInfoProjects>({});
 
-export const changeInfoAtomsAtom = splitAtom(changeInfoListAtom);
+export const selectedRevisionsAtom = atom<SelectedRevisions>({});
 
 export const jenkinsBuildInfoAtom = atom<JenkinsBuildInfo>((get) => {
-	const changeInfoList = get(changeInfoListAtom);
-	const imageTags: JenkinsImageTag[] = changeInfoList
-		.filter((changeInfo) => changeInfo.isSelected)
-		.map((selected) => {
+	const selectedRevisions = get(selectedRevisionsAtom);
+	const imageTags: JenkinsImageTag[] = Object.keys(selectedRevisions).map(
+		(projectName) => {
+			const revision = selectedRevisions[projectName];
 			return {
-				project: selected.project,
-				tag: selected.current_revision,
+				project: projectName,
+				tag: revision,
 			};
-		});
+		}
+	);
 
 	return {
 		imageTags,

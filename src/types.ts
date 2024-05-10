@@ -8,6 +8,14 @@ export type GerritChangeInfo = {
 	isSelected?: boolean;
 };
 
+export type GerritChangeInfoProjects = {
+	[project: string]: GerritChangeInfo[];
+};
+
+export type SelectedRevisions = {
+	[project: string]: string;
+}
+
 export type JenkinsImageTag = {
 	project: string;
 	tag: string;

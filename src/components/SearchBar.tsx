@@ -1,61 +1,63 @@
-import { GerritChangeInfo } from "../types";
+import { GerritChangeInfo, GerritChangeInfoProjects } from "@/src/types";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useSetAtom } from "jotai";
-import { changeInfoListAtom } from "../store";
-import { Input } from "./ui/input";
+import { changeInfoProjectsAtom } from "@/src/store";
+import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 
 type SearchForm = {
 	topic: string;
 };
 
+/**
+ * example: https://gerrit.dev.benon.com/q/topic:%22expand-248-uk-address-lookup%22
+ *
+ */
 export const SearchBar = () => {
 	const { register, handleSubmit } = useForm<SearchForm>();
-	const setGerritChangeList = useSetAtom(changeInfoListAtom);
+	const setChangeInfoProjects = useSetAtom(changeInfoProjectsAtom);
 
 	const onSubmit: SubmitHandler<SearchForm> = (data) => {
-		setGerritChangeList([
-			{
-				current_revision: "1111111111",
-				project: "webui",
-				subject: "USER-111 XXX",
-			},
-			{
-				current_revision: "22222222",
-				project: "webui",
-				subject: "USER-222 YYY",
-			},
-			{
-				current_revision: "333333333",
-				project: "jl",
-				subject: "USER-3333 XXX",
-				isSelected: true
-			},
-		]);
-		// getGerritAccessTokenFromCookie().then((accessToken) => {
-		// 	getGerritChangeInfosByTopic({
-		// 		topic: data.topic,
-		// 		accessToken,
-		// 	}).then((changeInfos) => {
-		// 		const sorted = changeInfos.sort((a, b) => {
-		// 			if (a.project < b.project) {
-		// 				return -1;
-		// 			}
-		// 			if (a.project > b.project) {
-		// 				return 1;
-		// 			}
-		// 			return 0;
-		// 		});
-		// 		const initSelectedProjects: string[] = [];
-		// 		sorted.forEach((changeInfo) => {
-		// 			if (!initSelectedProjects.includes(changeInfo.project)) {
-		// 				changeInfo.isSelected = true;
-		// 				initSelectedProjects.push(changeInfo.project);
-		// 			}
-		// 		});
-		// 		setGerritChangeList(sorted);
-		// 	});
-		// });
+		setChangeInfoProjects({
+			web: [
+				{
+					current_revision: "1111111111",
+					project: "webui",
+					subject: "USER-111 XXX",
+				},
+				{
+					current_revision: "22222222",
+					project: "webui",
+					subject: "USER-222 YYY",
+				},
+			],
+			jl: [
+				{
+					current_revision: "333333333",
+					project: "jl",
+					subject: "USER-3333 XXX",
+					isSelected: true,
+				},
+			],
+		});
+		getGerritAccessTokenFromCookie().then((accessToken) => {
+			getGerritChangeInfosByTopic({
+				topic: data.topic,
+				accessToken,
+			}).then((changeInfos) => {
+				const changeInfoProjects: GerritChangeInfoProjects = {};
+
+				changeInfos.forEach((changeInfo) => {
+					const project = changeInfoProjects[changeInfo.project];
+					if (project) {
+						project.push(changeInfo);
+					} else {
+						changeInfoProjects[changeInfo.project] = [changeInfo];
+					}
+				});
+				setChangeInfoProjects(changeInfoProjects);
+			});
+		});
 	};
 
 	return (

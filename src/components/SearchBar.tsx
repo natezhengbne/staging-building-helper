@@ -40,7 +40,7 @@ export const SearchBar = () => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)}>
+		<form onSubmit={handleSubmit(onSubmit)} autoComplete="off" autoFocus>
 			<div className="flex w-full max-w-sm items-center space-x-2">
 				<Input {...register("topic")} placeholder="Topic" required />
 				<Button type="submit">Search</Button>

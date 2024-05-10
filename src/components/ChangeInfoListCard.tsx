@@ -115,15 +115,6 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 };
 
 const fillJenkinsBuildForm = async (jenkinsBuildInfo: JenkinsBuildInfo) => {
-	chrome.tabs
-		.query({
-			active: true,
-			url: "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/*",
-		})
-		.then((tabs) => {
-			console.log(tabs);
-		});
-
 	const jenkinsTabs = await chrome.tabs.query({
 		active: true,
 		url: "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/*",
@@ -156,6 +147,8 @@ const runImagesTagsScript = (jenkinsBuildInfo: JenkinsBuildInfo) => {
 			const inputField = field.nextElementSibling as HTMLInputElement;
 			if (inputField) {
 				inputField.value = imageTag.tag;
+				// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
+				inputField.style = "color: white; background-color: blue";
 			}
 		}
 	});

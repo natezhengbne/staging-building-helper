@@ -4,9 +4,14 @@ This Chrome extension simplifies filling the image tag in Jenkins pipeline build
 
 ## Features:
 
-- Input a topic in the search bar.
-- Select the desired patch from the search results.
-- Click a button to automatically populate the image revision field in the Jenkins page with the selected patch's image revision.
+- Search for patches by topic on Gerrit.
+- Populate the "revisions" or "site/cluster" fields in the Cluster.pipeline page with the chosen build content.
+- Remember the most recently used site and cluster as the default for the next session.
+
+## Limitations:
+
+- Requires manual Gerrit access token generation.
+- Limited to Pipeline.cluster build form page.
 
 ## Installation:
 

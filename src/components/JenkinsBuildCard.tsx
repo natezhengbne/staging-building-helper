@@ -11,17 +11,42 @@ import { Badge } from "./ui/badge";
 import { SiteCard } from "./SiteCard";
 import { Separator } from "@/src/components/ui/separator";
 import { ClusterNameCard } from "./ClusterNameCard";
+import { getCurrentJenkinsPageTab } from "../chromeHelpers";
+import { useState } from "react";
 
 export const JenkinsBuildCard = () => {
 	const projects = useAtomValue(changeInfoProjectsAtom);
 	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
+	const [error, setError] = useState("");
 
 	if (!projects || Object.keys(projects).length <= 0) {
 		return null;
 	}
 
-	const handlePrefill = () => {
-		fillJenkinsBuildForm(jenkinsBuildInfo);
+	const handlePrefill = async () => {
+		setError("");
+		const [jenkinsTab] = await getCurrentJenkinsPageTab();
+		if (!jenkinsTab || !jenkinsTab.id) {
+			setError("should use it in Pipeline build page");
+			return;
+		}
+		
+		const [logoutComponent] = await chrome.scripting.executeScript({
+			target: { tabId: jenkinsTab.id },
+			func: () => {
+				return document.querySelector("a[href='/logout']")?.textContent;
+			}
+		});
+		if (logoutComponent.result !== "log out") {
+			setError("It only works after you log in to Jenkins");
+			return;
+		}
+
+		await chrome.scripting.executeScript({
+			target: { tabId: jenkinsTab.id },
+			func: runImagesTagsScript,
+			args: [jenkinsBuildInfo],
+		});
 	};
 
 	return (
@@ -43,9 +68,16 @@ export const JenkinsBuildCard = () => {
 			<SiteCard />
 			<Separator className="my-3" />
 			<ClusterNameCard />
-			<div className="mt-3">
-				<Button size="sm" className="bg-indigo-500" onClick={handlePrefill}>Prefill</Button>
+			<div className="mt-3 flex justify-between">
+				<Button size="sm" className="bg-indigo-500" onClick={handlePrefill}>
+					Prefill
+				</Button>
 			</div>
+			{error && (
+				<div className="p-2 text-red-600 text-sm">
+					<p>{error}</p>
+				</div>
+			)}
 		</div>
 	);
 };
@@ -113,7 +145,7 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 				>
 					{changeInfo.subject}
 				</label>
-				<div className="w-14 self-center">
+				<div className="w-1/2 self-center">
 					<p className="text-xs text-muted-foreground text-ellipsis overflow-hidden">
 						{changeInfo.current_revision}
 					</p>
@@ -123,68 +155,39 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 	);
 };
 
-const fillJenkinsBuildForm = async (jenkinsBuildInfo: JenkinsBuildInfo) => {
-	const jenkinsTabs = await chrome.tabs.query({
-		active: true,
-		url: "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/*",
-	});
-
-	if (!jenkinsTabs || jenkinsTabs.length <= 0) {
-		return Promise.reject();
-	}
-
-	const jenkinsTab = jenkinsTabs[0];
-
-	if (!jenkinsTab || !jenkinsTab.id) {
-		return Promise.reject();
-	}
-
-	await chrome.scripting.executeScript({
-		target: { tabId: jenkinsTab.id },
-		func: runImagesTagsScript,
-		args: [jenkinsBuildInfo],
-	});
-};
-
 const runImagesTagsScript = (jenkinsBuildInfo: JenkinsBuildInfo) => {
 	jenkinsBuildInfo.imageTags.forEach((imageTag) => {
-		const nodes = document.querySelectorAll(
-			`input[value="${imageTag.fieldLabel}"]`
-		);
-		if (nodes && nodes.length > 0) {
-			const field = nodes[0];
-			const inputField = field.nextElementSibling as HTMLInputElement;
-			if (inputField) {
-				inputField.value = imageTag.tag;
-				// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
-				inputField.style = "color: white; background-color: blue";
-			}
-		}
+		populateInputField(imageTag.fieldLabel, imageTag.tag);
 	});
 
 	if (jenkinsBuildInfo.site) {
-		const nodes = document.querySelectorAll(`input[value="POWERED_BY_JUMBO"]`);
-		if (nodes && nodes.length > 0) {
-			const field = nodes[0];
-			const inputField = field.nextElementSibling as HTMLInputElement;
-			if (inputField) {
-				inputField.value = jenkinsBuildInfo.site;
-				// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
-				inputField.style = "color: white; background-color: blue";
-			}
-		}
+		populateInputField("POWERED_BY_JUMBO", jenkinsBuildInfo.site);
 	}
 
 	if (jenkinsBuildInfo.cluster) {
-		const nodes = document.querySelectorAll(`input[value="CLUSTER_NAME"]`);
-		if (nodes && nodes.length > 0) {
-			const field = nodes[0];
-			const inputField = field.nextElementSibling as HTMLInputElement;
-			if (inputField) {
-				inputField.value = jenkinsBuildInfo.cluster;
-				// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
-				inputField.style = "color: white; background-color: blue";
-			}
+		populateInputField("CLUSTER_NAME", jenkinsBuildInfo.cluster);
+	}
+};
+
+const populateInputField = (label: string, value: string) => {
+	const [node] = document.querySelectorAll(`input[value="${label}"]`);
+	if (node) {
+		const inputField = node.nextElementSibling as HTMLInputElement;
+		if (inputField) {
+			inputField.value = value;
+			// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
+			inputField.style = "color: white; background-color: blue";
 		}
 	}
 };
+
+const checkIsJenkinsLoggedIn = async (chromeTabId: number) => {
+	
+
+	const x = await chrome.scripting.executeScript({
+		target: { tabId: chromeTabId },
+		func: () => document.querySelector("a[href='/logout']")
+	});
+
+	console.log(x);
+}

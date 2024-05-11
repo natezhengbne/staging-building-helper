@@ -3,7 +3,13 @@
     "name": "Staging server building helper",
     "version": "1.0.0",
     "action": {
-        "default_popup": "index.html"
+        "default_title": "Click to open panel"
+    },
+    "background": {
+        "service_worker": "service-worker.js"
+    },
+    "side_panel": {
+        "default_path": "index.html"
     },
     "icons": {
         "16": "icon128.png",
@@ -19,6 +25,9 @@
         "cookies",
         "tabs",
         "scripting",
-        "activeTab"
+        "activeTab",
+        "sidePanel",
+        "contextMenus",
+        "storage"
     ]
 }

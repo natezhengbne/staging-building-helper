@@ -1,8 +1,19 @@
 body {
 	margin: 0;
 	display: flex;
-	min-width: 640px;
+	min-width: 360px;
 	min-height: 100vh;
+}
+
+#root {
+	background-color: rgb(255 251 235);
+	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+	color-scheme: light dark;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 @tailwind base;

@@ -6,6 +6,7 @@ import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { gerritChangeInfoProjectsData } from "../fixture";
 import { useState } from "react";
+import { getCurrentJenkinsPageTab } from "../chromeHelpers";
 
 type SearchForm = {
 	topic: string;
@@ -20,34 +21,43 @@ export const SearchBar = () => {
 	const setChangeInfoProjects = useSetAtom(changeInfoProjectsAtom);
 	const [error, setError] = useState("");
 
-	const onSubmit: SubmitHandler<SearchForm> = (data) => {
+	const onSubmit: SubmitHandler<SearchForm> = async (data) => {
+		if (data.topic === "111") {
+			setChangeInfoProjects(gerritChangeInfoProjectsData);
+			return;
+		}
 		setError("");
-		// setChangeInfoProjects(gerritChangeInfoProjectsData);
-		getGerritAccessTokenFromCookie()
-			.then((accessToken) => {
-				getGerritChangeInfosByTopic({
-					topic: data.topic,
-					accessToken,
-				})
-					.then((changeInfos) => {
-						if (!changeInfos || changeInfos.length === 0) {
-							return Promise.reject("Non results returned");
-						}
-						const changeInfoProjects: GerritChangeInfoProjects = {};
+		const [tab] = await getCurrentJenkinsPageTab();
+		if (!tab) {
+			setError("It is designed to be used on the Jenkins pipeline build page");
+			return;
+		}
 
-						changeInfos.forEach((changeInfo) => {
-							const project = changeInfoProjects[changeInfo.project];
-							if (project) {
-								project.push(changeInfo);
-							} else {
-								changeInfoProjects[changeInfo.project] = [changeInfo];
-							}
-						});
-						setChangeInfoProjects(changeInfoProjects);
-					})
-					.catch((err: string) => setError(err ?? "Gerrit query failed"));
-			})
-			.catch(() => setError("The Gerrit access token is unreachable"));
+		const accessToken = await getGerritAccessTokenFromCookie();
+		if (!accessToken) {
+			setError("The Gerrit access token is unreachable");
+			return;
+		}
+
+		const changeInfos = await getGerritChangeInfosByTopic({
+			topic: data.topic,
+			accessToken,
+		});
+		if (!changeInfos) {
+			setError("Gerrit query failed");
+			return;
+		}
+
+		const changeInfoProjects: GerritChangeInfoProjects = {};
+		changeInfos.forEach((changeInfo) => {
+			const project = changeInfoProjects[changeInfo.project];
+			if (project) {
+				project.push(changeInfo);
+			} else {
+				changeInfoProjects[changeInfo.project] = [changeInfo];
+			}
+		});
+		setChangeInfoProjects(changeInfoProjects);
 	};
 
 	return (
@@ -72,7 +82,7 @@ export const SearchBar = () => {
 	);
 };
 
-const getGerritAccessTokenFromCookie = async (): Promise<string> => {
+const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
 	const result = await chrome.cookies.getAll({
 		domain: "gerrit.dev.benon.com",
 		name: "GerritAccount",
@@ -81,13 +91,13 @@ const getGerritAccessTokenFromCookie = async (): Promise<string> => {
 		return result[0].value;
 	}
 
-	return Promise.reject();
+	return null;
 };
 
 const getGerritChangeInfosByTopic = async (search: {
 	topic: string;
 	accessToken: string;
-}): Promise<GerritChangeInfo[]> => {
+}): Promise<GerritChangeInfo[] | null> => {
 	const params = new URLSearchParams({
 		q: `topic:${search.topic}`,
 		pp: "0",
@@ -100,7 +110,7 @@ const getGerritChangeInfosByTopic = async (search: {
 	);
 
 	if (!response.ok) {
-		return Promise.reject();
+		return null;
 	}
 
 	const body = await response.text();

@@ -30,12 +30,12 @@ export const JenkinsBuildCard = () => {
 			setError("should use it in Pipeline build page");
 			return;
 		}
-		
+
 		const [logoutComponent] = await chrome.scripting.executeScript({
 			target: { tabId: jenkinsTab.id },
 			func: () => {
 				return document.querySelector("a[href='/logout']")?.textContent;
-			}
+			},
 		});
 		if (logoutComponent.result !== "log out") {
 			setError("It only works after you log in to Jenkins");
@@ -180,14 +180,3 @@ const populateInputField = (label: string, value: string) => {
 		}
 	}
 };
-
-const checkIsJenkinsLoggedIn = async (chromeTabId: number) => {
-	
-
-	const x = await chrome.scripting.executeScript({
-		target: { tabId: chromeTabId },
-		func: () => document.querySelector("a[href='/logout']")
-	});
-
-	console.log(x);
-}

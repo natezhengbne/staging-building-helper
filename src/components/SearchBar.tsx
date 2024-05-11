@@ -9,13 +9,9 @@ import { useEffect, useState } from "react";
 import { getCurrentJenkinsPageTab } from "../chromeHelpers";
 
 type SearchForm = {
-	topic: string;
+	query: string;
 };
 
-/**
- * example: https://gerrit.dev.benon.com/q/topic:%22expand-248-uk-address-lookup%22
- *
- */
 export const SearchBar = () => {
 	const { register, handleSubmit, reset, getValues } = useForm<SearchForm>();
 	const [changeInfoProjects, setChangeInfoProjects] = useAtom(
@@ -25,14 +21,14 @@ export const SearchBar = () => {
 
 	useEffect(() => {
 		if (!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0) {
-			if (getValues("topic")) {
+			if (getValues("query")) {
 				reset();
 			}
 		}
 	}, [changeInfoProjects, getValues, reset]);
 
 	const onSubmit: SubmitHandler<SearchForm> = async (data) => {
-		if (data.topic === "111") {
+		if (data.query === "111") {
 			setChangeInfoProjects(gerritChangeInfoProjectsData);
 			return;
 		}
@@ -49,10 +45,10 @@ export const SearchBar = () => {
 			return;
 		}
 
-		const changeInfos = await getGerritChangeInfosByTopic({
-			topic: data.topic,
+		const changeInfos = await getGerritChangeInfosByTopic(
 			accessToken,
-		});
+			data.query
+		);
 		if (!changeInfos) {
 			setError("Gerrit query failed");
 			return;
@@ -74,8 +70,8 @@ export const SearchBar = () => {
 		<form onSubmit={handleSubmit(onSubmit)} autoComplete="off" autoFocus>
 			<div className="flex w-full items-center space-x-2">
 				<Input
-					{...register("topic")}
-					placeholder="Topic"
+					{...register("query")}
+					placeholder="Topic/URL/CommitID"
 					required
 					onFocus={() => setError("")}
 				/>
@@ -104,15 +100,46 @@ const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
 	return null;
 };
 
-const getGerritChangeInfosByTopic = async (search: {
-	topic: string;
-	accessToken: string;
-}): Promise<GerritChangeInfo[] | null> => {
+const getGerritChangeInfosByTopic = async (
+	accessToken: string,
+	query: string
+): Promise<GerritChangeInfo[] | null> => {
+	let gerritQueryParameter = "";
+
+	// handle url: https://gerrit.dev.benon.com/c/admin-ui/+/124403
+	try {
+		const url = new URL(query);
+		if (url.origin === "https://gerrit.dev.benon.com") {
+			const pathNames = url.pathname.split("/");
+			const idNumber = pathNames[pathNames.length - 1];
+			const isNumber = /^\d+$/.test(idNumber);
+			if (isNumber) {
+				gerritQueryParameter = `change:${idNumber}`;
+			}
+		}
+	} catch (e) {
+		// do nothing
+	}
+
+	// handle SHA: 3c7a4f7054f73659595d8b974373352aba0a7d53
+	if (!gerritQueryParameter && /\b([a-f0-9]{40})\b/.test(query)) {
+		gerritQueryParameter = query;
+	}
+
+	// handle topic: expand-248-uk-address-lookup
+	if (!gerritQueryParameter) {
+		gerritQueryParameter = `topic:${query}`;
+	}
+
+	if (!gerritQueryParameter) {
+		return null;
+	}
+
 	const params = new URLSearchParams({
-		q: `topic:${search.topic}`,
+		q: gerritQueryParameter,
 		pp: "0",
 		o: "CURRENT_REVISION",
-		access_token: search.accessToken,
+		access_token: accessToken,
 	});
 
 	const response = await fetch(

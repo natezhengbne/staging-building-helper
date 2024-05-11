@@ -75,7 +75,7 @@ export const JenkinsBuildCard = () => {
 			<SiteCard />
 			<Separator className="my-3" />
 			<ClusterNameCard />
-			<div className="mt-3 flex justify-between">
+			<div className="mt-6 flex justify-end gap-4">
 				<Button size="sm" className="bg-indigo-500" onClick={handlePrefill}>
 					Prefill
 				</Button>

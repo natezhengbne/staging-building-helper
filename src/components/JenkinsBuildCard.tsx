@@ -13,9 +13,12 @@ import { Separator } from "@/src/components/ui/separator";
 import { ClusterNameCard } from "./ClusterNameCard";
 import { getCurrentJenkinsPageTab } from "../chromeHelpers";
 import { useState } from "react";
+import { useResetAtom } from "jotai/utils";
 
 export const JenkinsBuildCard = () => {
 	const projects = useAtomValue(changeInfoProjectsAtom);
+	const resetProjects = useResetAtom(changeInfoProjectsAtom);
+
 	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
 	const [error, setError] = useState("");
 
@@ -44,9 +47,13 @@ export const JenkinsBuildCard = () => {
 
 		await chrome.scripting.executeScript({
 			target: { tabId: jenkinsTab.id },
-			func: runImagesTagsScript,
+			func: runPopulateFieldsScripts,
 			args: [jenkinsBuildInfo],
 		});
+	};
+
+	const handleClearAll = () => {
+		resetProjects();
 	};
 
 	return (
@@ -71,6 +78,9 @@ export const JenkinsBuildCard = () => {
 			<div className="mt-3 flex justify-between">
 				<Button size="sm" className="bg-indigo-500" onClick={handlePrefill}>
 					Prefill
+				</Button>
+				<Button size="sm" variant="destructive" onClick={handleClearAll}>
+					Clear All
 				</Button>
 			</div>
 			{error && (
@@ -155,7 +165,7 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 	);
 };
 
-const runImagesTagsScript = (jenkinsBuildInfo: JenkinsBuildInfo) => {
+const runPopulateFieldsScripts = (jenkinsBuildInfo: JenkinsBuildInfo) => {
 	jenkinsBuildInfo.imageTags.forEach((imageTag) => {
 		populateInputField(imageTag.fieldLabel, imageTag.tag);
 	});

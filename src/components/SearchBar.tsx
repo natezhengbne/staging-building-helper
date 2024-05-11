@@ -1,11 +1,11 @@
 import { GerritChangeInfo, GerritChangeInfoProjects } from "@/src/types";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { changeInfoProjectsAtom } from "@/src/store";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { gerritChangeInfoProjectsData } from "../fixture";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getCurrentJenkinsPageTab } from "../chromeHelpers";
 
 type SearchForm = {
@@ -17,9 +17,19 @@ type SearchForm = {
  *
  */
 export const SearchBar = () => {
-	const { register, handleSubmit } = useForm<SearchForm>();
-	const setChangeInfoProjects = useSetAtom(changeInfoProjectsAtom);
+	const { register, handleSubmit, reset, getValues } = useForm<SearchForm>();
+	const [changeInfoProjects, setChangeInfoProjects] = useAtom(
+		changeInfoProjectsAtom
+	);
 	const [error, setError] = useState("");
+
+	useEffect(() => {
+		if (!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0) {
+			if (getValues("topic")) {
+				reset();
+			}
+		}
+	}, [changeInfoProjects, getValues, reset]);
 
 	const onSubmit: SubmitHandler<SearchForm> = async (data) => {
 		if (data.topic === "111") {

@@ -5,8 +5,9 @@ import {
 	JenkinsImageTag,
 	SelectedRevisions,
 } from "@/src/types";
+import { atomWithReset } from "jotai/utils";
 
-export const changeInfoProjectsAtom = atom<GerritChangeInfoProjects>({});
+export const changeInfoProjectsAtom = atomWithReset<GerritChangeInfoProjects>({});
 
 export const selectedRevisionsAtom = atom<SelectedRevisions>({});
 export const selectedSiteAtom = atom<string>("ozl");

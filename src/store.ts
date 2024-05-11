@@ -10,7 +10,7 @@ import { atomWithReset } from "jotai/utils";
 export const changeInfoProjectsAtom = atomWithReset<GerritChangeInfoProjects>({});
 
 export const selectedRevisionsAtom = atom<SelectedRevisions>({});
-export const selectedSiteAtom = atom<string>("ozl");
+export const selectedSiteAtom = atom<string>("");
 export const selectedClusterNameAtom = atom<string>("");
 export const selectedClusterIdAtom = atom<string>("");
 

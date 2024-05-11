@@ -7,6 +7,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "./ui/accordion";
+import { useEffect } from "react";
 
 export const SiteCard = () => {
 	return (
@@ -30,11 +31,29 @@ type SitesContainerProps = {
 const SitesContainer = ({ sites }: SitesContainerProps) => {
 	const [selected, setSelected] = useAtom(selectedSiteAtom);
 
+	useEffect(() => {
+		if (selected) {
+			return;
+		}
+		chrome.storage.local.get(["defaultSite"]).then((result) => {
+			const storedSite = result["defaultSite"];
+			if (storedSite) {
+				setSelected(storedSite);
+			}
+		});
+	}, [setSelected, selected]);
+
 	return (
 		<div className="flex gap-1 flex-wrap">
 			{sites.map((site) => {
 				const handleClick = (e: React.MouseEvent<Element, MouseEvent>) => {
-					setSelected(selected === site ? "" : site);
+					const updated = selected === site ? "" : site;
+					setSelected(updated);
+
+					if (updated) {
+						chrome.storage.local.set({ defaultSite: site });
+					}
+
 					e.preventDefault();
 				};
 				return (

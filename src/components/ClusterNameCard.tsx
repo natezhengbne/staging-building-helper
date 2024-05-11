@@ -1,12 +1,25 @@
 import { useAtom } from "jotai";
 import { Badge } from "./ui/badge";
 import { selectedClusterNameAtom, selectedClusterIdAtom } from "../store";
+import { useEffect } from "react";
 
 export const ClusterNameCard = () => {
 	const [selectedCluster, setSelectedCluster] = useAtom(
 		selectedClusterNameAtom
 	);
 	const [selectedId, setSelectedId] = useAtom(selectedClusterIdAtom);
+
+	useEffect(() => {
+		if (selectedCluster) {
+			return;
+		}
+		chrome.storage.local.get(["defaultClusterName"]).then((result) => {
+			const storedClusterName = result["defaultClusterName"];
+			if (storedClusterName) {
+				setSelectedCluster(storedClusterName);
+			}
+		});
+	}, [setSelectedCluster, selectedCluster]);
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -16,7 +29,10 @@ export const ClusterNameCard = () => {
 						<Badge
 							key={cluster}
 							variant={selectedCluster === cluster ? "default" : "outline"}
-							onClick={() => setSelectedCluster(cluster)}
+							onClick={() => {
+								setSelectedCluster(cluster);
+								chrome.storage.local.set({ defaultClusterName: cluster });
+							}}
 						>
 							{cluster}
 						</Badge>

@@ -44,7 +44,7 @@ const SitesContainer = ({ sites }: SitesContainerProps) => {
 	}, [setSelected, selected]);
 
 	return (
-		<div className="flex gap-1 flex-wrap">
+		<div className="flex gap-1 flex-wrap cursor-pointer">
 			{sites.map((site) => {
 				const handleClick = (e: React.MouseEvent<Element, MouseEvent>) => {
 					const updated = selected === site ? "" : site;

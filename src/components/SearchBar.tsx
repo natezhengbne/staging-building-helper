@@ -48,8 +48,8 @@ export const SearchBar = () => {
 
 		const changeInfos = await queryGerritChangeInfos(accessToken, data.query);
 
-		if (!changeInfos) {
-			setError("Gerrit query failed");
+		if (!changeInfos || changeInfos.length <= 0) {
+			setError("Gerrit query failed or no results");
 			return;
 		}
 

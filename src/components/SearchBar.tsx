@@ -48,23 +48,31 @@ export const SearchBar = () => {
 			return;
 		}
 
-		const changeInfos = await queryGerritChangeInfos(accessToken, data.query);
-
-		if (!changeInfos || changeInfos.length <= 0) {
-			setError("Gerrit query failed or no results");
-			return;
+		let changeInfos: GerritChangeInfo[] = [];
+		try {
+			changeInfos = await queryGerritChangeInfos(accessToken, data.query);
+		} catch (e) {
+			if (e instanceof Error) {
+				setError(e.message);
+			} else {
+				setError("No Gerrit patches match your search");
+			}
 		}
 
-		const changeInfoProjects: GerritChangeInfoProjects = {};
-		changeInfos.forEach((changeInfo) => {
-			const project = changeInfoProjects[changeInfo.project];
-			if (project) {
-				project.push(changeInfo);
-			} else {
-				changeInfoProjects[changeInfo.project] = [changeInfo];
-			}
-		});
-		setChangeInfoProjects(changeInfoProjects);
+		if (changeInfos && changeInfos.length > 0) {
+			const changeInfoProjects: GerritChangeInfoProjects = {};
+			changeInfos.forEach((changeInfo) => {
+				const project = changeInfoProjects[changeInfo.project];
+				if (project) {
+					project.push(changeInfo);
+				} else {
+					changeInfoProjects[changeInfo.project] = [changeInfo];
+				}
+			});
+			setChangeInfoProjects(changeInfoProjects);
+		} else {
+			setError("No Gerrit patches match your search");
+		}
 	};
 
 	return (
@@ -130,7 +138,7 @@ const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
 const queryGerritChangeInfos = async (
 	accessToken: string,
 	query: string
-): Promise<GerritChangeInfo[] | null> => {
+): Promise<GerritChangeInfo[]> => {
 	let gerritQueryParameter = "";
 
 	// handle url: https://gerrit.dev.benon.com/c/admin-ui/+/124403
@@ -143,6 +151,8 @@ const queryGerritChangeInfos = async (
 			if (isNumber) {
 				gerritQueryParameter = `change:${idNumber}`;
 			}
+		} else {
+			return Promise.reject(new Error("The Gerrit URL is invalid"));
 		}
 	} catch (e) {
 		// do nothing
@@ -159,7 +169,7 @@ const queryGerritChangeInfos = async (
 	}
 
 	if (!gerritQueryParameter) {
-		return null;
+		return Promise.reject(new Error("Query parameter is invalid"));
 	}
 
 	const params = new URLSearchParams({
@@ -174,11 +184,14 @@ const queryGerritChangeInfos = async (
 	);
 
 	if (!response.ok) {
-		return null;
+		return Promise.reject(new Error(`Query failed: ${response.status}`));
 	}
 
 	const body = await response.text();
 	const cleanedBody = body.replace(")]}'", "");
+	if (!cleanedBody) {
+		return Promise.reject(new Error("No Gerrit patches match your search"));
+	}
 
 	return JSON.parse(cleanedBody);
 };

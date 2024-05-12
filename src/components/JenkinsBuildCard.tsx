@@ -14,6 +14,7 @@ import { ClusterNameCard } from "./ClusterNameCard";
 import { getCurrentJenkinsPageTab } from "../chromeHelpers";
 import { useState } from "react";
 import { useResetAtom } from "jotai/utils";
+import dayjs from "dayjs";
 
 export const JenkinsBuildCard = () => {
 	const projects = useAtomValue(changeInfoProjectsAtom);
@@ -102,7 +103,7 @@ const ProjectChangeInfoItems = (props: ProjectChangeInfoItemsProps) => {
 
 	return (
 		<div>
-			<Badge className="rounded-none" variant="secondary">
+			<Badge className="rounded-none px-2" variant="secondary">
 				{projectName}
 			</Badge>
 			<li className="rounded-none border p-2 shadow flex flex-col gap-y-1">
@@ -132,7 +133,6 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 	const checkboxId = `checkbox-${changeInfo.current_revision}`;
 
 	const handleClick = (checked: boolean) => {
-		console.log(changeInfo.subject, checked);
 		setSelected((prev) => {
 			return {
 				...prev,
@@ -140,6 +140,14 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 			};
 		});
 	};
+
+	const created =
+		changeInfo.revisions &&
+		changeInfo.revisions[changeInfo.current_revision]?.created;
+	const createdTime =
+		created && dayjs(created).add(dayjs().utcOffset(), "m").format("DDMMM H:m");
+
+	const isCiPassed = isCommitCiVerified(changeInfo);
 
 	return (
 		<div className="items-top flex space-x-2">
@@ -155,10 +163,17 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 				>
 					{changeInfo.subject}
 				</label>
-				<div className="w-1/2 self-center">
-					<p className="text-xs text-muted-foreground text-ellipsis overflow-hidden">
-						{changeInfo.current_revision}
-					</p>
+				<div className="flex justify-between">
+					<div className="w-1/2 self-center">
+						<p className="text-xs text-muted-foreground text-ellipsis overflow-hidden">
+							{changeInfo.current_revision}
+						</p>
+					</div>
+					<div className="flex gap-1 items-center">
+						{isCiPassed && <p className="text-xs text-green-500 font-medium">CI</p>}
+						<Separator orientation="vertical" />
+						<p className="text-xs text-muted-foreground">{createdTime}</p>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -189,4 +204,18 @@ const populateInputField = (label: string, value: string) => {
 			inputField.style = "color: white; background-color: blue";
 		}
 	}
+};
+
+const isCommitCiVerified = (changeInfo: GerritChangeInfo) => {
+	return !!changeInfo.submit_records?.find((submitRecord) => {
+		if (submitRecord.rule_name === "gerrit~DefaultSubmitRule") {
+			const ciVerifiedRecord = submitRecord.labels.find((recordLabel) => {
+				return (
+					recordLabel.label === "CI-Verified" && recordLabel.status === "OK"
+				);
+			});
+			return !!ciVerifiedRecord;
+		}
+		return false;
+	});
 };

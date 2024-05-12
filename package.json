@@ -16,6 +16,7 @@
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
+    "dayjs": "^1.11.11",
     "jotai": "^2.8.0",
     "jotai-optics": "^0.3.2",
     "optics-ts": "^2.4.1",

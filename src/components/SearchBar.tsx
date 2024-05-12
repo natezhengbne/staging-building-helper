@@ -49,6 +49,7 @@ export const SearchBar = () => {
 			accessToken,
 			data.query
 		);
+
 		if (!changeInfos) {
 			setError("Gerrit query failed");
 			return;

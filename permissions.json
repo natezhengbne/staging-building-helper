@@ -20,6 +20,6 @@
         "ORIGIN_HTTPS": "https://gerrit.dev.benon.com"
     },
     "GERRIT_API": {
-        "REST_CHANGE": "https://gerrit.dev.benon.com/changes"
+        "REST_CHANGES": "https://gerrit.dev.benon.com/changes"
     }
 }

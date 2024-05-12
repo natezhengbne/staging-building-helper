@@ -143,7 +143,7 @@ const queryGerritChangeInfos = async (
 	});
 
 	const response = await fetch(
-		`${permissionConfig.GERRIT_API.REST_CHANGE}?${params}`
+		`${permissionConfig.GERRIT_API.REST_CHANGES}?${params}`
 	);
 
 	if (!response.ok) {

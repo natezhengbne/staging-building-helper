@@ -84,7 +84,6 @@ export const SearchBar = () => {
 						{...register("query")}
 						placeholder="Topic/URL/CommitID"
 						required
-						onFocus={() => setError("")}
 					/>
 					<Button type="submit" className="bg-indigo-500">
 						Search

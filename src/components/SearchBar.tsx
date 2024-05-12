@@ -188,8 +188,10 @@ const queryGerritChangeInfos = async (
 
 	const body = await response.text();
 	const cleanedBody = body.replace(")]}'", "");
-	if (!cleanedBody) {
-		return Promise.reject(new Error("No Gerrit patches match your search"));
+	if (!cleanedBody || cleanedBody === "[]") {
+		return Promise.reject(
+			new Error("No patches match your search or Gerrit session expired")
+		);
 	}
 
 	return JSON.parse(cleanedBody);

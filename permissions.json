@@ -1,0 +1,25 @@
+{
+    "CHROME_MANIFEST": {
+        "HOST_PERMISSIONS": [
+            "https://*.dev.benon.com/*",
+            "http://*.dev.benon.com/*"
+        ],
+        "PERMISSIONS": [
+            "cookies",
+            "tabs",
+            "scripting",
+            "activeTab",
+            "sidePanel",
+            "contextMenus",
+            "storage"
+        ]
+    },
+    "GERRIT_WEB": {
+        "DOMAIN": "gerrit.dev.benon.com",
+        "COOKIE_NAME_ACCESS_TOKEN": "GerritAccount",
+        "ORIGIN_HTTPS": "https://gerrit.dev.benon.com"
+    },
+    "GERRIT_API": {
+        "REST_CHANGE": "https://gerrit.dev.benon.com/changes"
+    }
+}

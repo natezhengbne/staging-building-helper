@@ -7,11 +7,11 @@ import {
 import { Checkbox } from "@/src/components/ui/checkbox";
 import { GerritChangeInfo, JenkinsBuildInfo } from "@/src/types";
 import { Button } from "@/src/components/ui/button";
-import { Badge } from "./ui/badge";
-import { SiteCard } from "./SiteCard";
+import { Badge } from "@/src/components/ui/badge";
+import { SiteCard } from "@/src/components/SiteCard";
 import { Separator } from "@/src/components/ui/separator";
 import { ClusterNameCard } from "./ClusterNameCard";
-import { getCurrentJenkinsPageTab } from "../chromeHelpers";
+import { getCurrentJenkinsPageTab } from "@/src/chromeHelpers";
 import { useState } from "react";
 import { useResetAtom } from "jotai/utils";
 import dayjs from "dayjs";
@@ -145,7 +145,7 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 		changeInfo.revisions &&
 		changeInfo.revisions[changeInfo.current_revision]?.created;
 	const createdTime =
-		created && dayjs(created).add(dayjs().utcOffset(), "m").format("DDMMM H:m");
+		created && dayjs(created).add(dayjs().utcOffset(), "m").format("DDMMM HH:mm");
 
 	const isCiPassed = isCommitCiVerified(changeInfo);
 
@@ -156,7 +156,7 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 				checked={isSelected}
 				onCheckedChange={handleClick}
 			/>
-			<div className="grid">
+			<div className="grow grid">
 				<label
 					htmlFor={checkboxId}
 					className="text-xs font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 truncate"
@@ -164,15 +164,17 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 					{changeInfo.subject}
 				</label>
 				<div className="flex justify-between">
-					<div className="w-1/2 self-center">
-						<p className="text-xs text-muted-foreground text-ellipsis overflow-hidden">
+					<div className="w-20 self-center">
+						<p className="text-xs text-muted-foreground text-ellipsis overflow-hidden font-mono hover:font-serif">
 							{changeInfo.current_revision}
 						</p>
 					</div>
 					<div className="flex gap-1 items-center">
-						{isCiPassed && <p className="text-xs text-green-500 font-medium">CI</p>}
+						{isCiPassed && (
+							<p className="text-xs text-green-500 font-medium">CI</p>
+						)}
 						<Separator orientation="vertical" />
-						<p className="text-xs text-muted-foreground">{createdTime}</p>
+						<span className="text-xs text-muted-foreground font-mono">{createdTime}</span>
 					</div>
 				</div>
 			</div>

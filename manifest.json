@@ -16,18 +16,5 @@
         "32": "icon128.png",
         "48": "icon128.png",
         "128": "icon128.png"
-    },
-    "host_permissions": [
-        "https://*.dev.benon.com/*",
-        "http://*.dev.benon.com/*"
-    ],
-    "permissions": [
-        "cookies",
-        "tabs",
-        "scripting",
-        "activeTab",
-        "sidePanel",
-        "contextMenus",
-        "storage"
-    ]
+    }
 }

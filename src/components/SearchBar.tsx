@@ -7,6 +7,7 @@ import { Button } from "@/src/components/ui/button";
 import { gerritChangeInfoProjectsData } from "../fixture";
 import { useEffect, useState } from "react";
 import { getCurrentJenkinsPageTab } from "../chromeHelpers";
+import { permissionConfig } from "@/src/permissions";
 
 type SearchForm = {
 	query: string;
@@ -45,10 +46,7 @@ export const SearchBar = () => {
 			return;
 		}
 
-		const changeInfos = await getGerritChangeInfosByTopic(
-			accessToken,
-			data.query
-		);
+		const changeInfos = await queryGerritChangeInfos(accessToken, data.query);
 
 		if (!changeInfos) {
 			setError("Gerrit query failed");
@@ -68,9 +66,10 @@ export const SearchBar = () => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} autoComplete="off" autoFocus>
+		<form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
 			<div className="flex w-full items-center space-x-2">
 				<Input
+					autoFocus
 					{...register("query")}
 					placeholder="Topic/URL/CommitID"
 					required
@@ -91,8 +90,8 @@ export const SearchBar = () => {
 
 const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
 	const result = await chrome.cookies.getAll({
-		domain: "gerrit.dev.benon.com",
-		name: "GerritAccount",
+		domain: permissionConfig.GERRIT_WEB.DOMAIN,
+		name: permissionConfig.GERRIT_WEB.COOKIE_NAME_ACCESS_TOKEN,
 	});
 	if (result && result.length > 0) {
 		return result[0].value;
@@ -101,7 +100,7 @@ const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
 	return null;
 };
 
-const getGerritChangeInfosByTopic = async (
+const queryGerritChangeInfos = async (
 	accessToken: string,
 	query: string
 ): Promise<GerritChangeInfo[] | null> => {
@@ -110,7 +109,7 @@ const getGerritChangeInfosByTopic = async (
 	// handle url: https://gerrit.dev.benon.com/c/admin-ui/+/124403
 	try {
 		const url = new URL(query);
-		if (url.origin === "https://gerrit.dev.benon.com") {
+		if (url.origin === permissionConfig.GERRIT_WEB.ORIGIN_HTTPS) {
 			const pathNames = url.pathname.split("/");
 			const idNumber = pathNames[pathNames.length - 1];
 			const isNumber = /^\d+$/.test(idNumber);
@@ -144,7 +143,7 @@ const getGerritChangeInfosByTopic = async (
 	});
 
 	const response = await fetch(
-		`https://gerrit.dev.benon.com/changes?${params}`
+		`${permissionConfig.GERRIT_API.REST_CHANGE}?${params}`
 	);
 
 	if (!response.ok) {

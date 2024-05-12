@@ -23,10 +23,6 @@ export const JenkinsBuildCard = () => {
 	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
 	const [error, setError] = useState("");
 
-	if (!projects || Object.keys(projects).length <= 0) {
-		return null;
-	}
-
 	const handlePrefill = async () => {
 		setError("");
 		const [jenkinsTab] = await getCurrentJenkinsPageTab();
@@ -56,6 +52,10 @@ export const JenkinsBuildCard = () => {
 	const handleClearAll = () => {
 		resetProjects();
 	};
+
+	if (!projects || Object.keys(projects).length <= 0) {
+		return null;
+	}
 
 	return (
 		<div className="mt-4">

@@ -19,14 +19,16 @@ export const SearchBar = () => {
 		changeInfoProjectsAtom
 	);
 	const [error, setError] = useState("");
+	const hasNoResults =
+		!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0;
 
 	useEffect(() => {
-		if (!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0) {
+		if (hasNoResults) {
 			if (getValues("query")) {
 				reset();
 			}
 		}
-	}, [changeInfoProjects, getValues, reset]);
+	}, [hasNoResults, getValues, reset]);
 
 	const onSubmit: SubmitHandler<SearchForm> = async (data) => {
 		if (data.query === "111") {
@@ -66,25 +68,50 @@ export const SearchBar = () => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-			<div className="flex w-full items-center space-x-2">
-				<Input
-					autoFocus
-					{...register("query")}
-					placeholder="Topic/URL/CommitID"
-					required
-					onFocus={() => setError("")}
-				/>
-				<Button type="submit" className="bg-indigo-500">
-					Search
-				</Button>
-			</div>
-			{error && (
-				<div className="p-2 text-red-600 text-sm">
-					<p>{error}</p>
+		<>
+			<form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+				<div className="flex w-full items-center space-x-2">
+					<Input
+						autoFocus
+						{...register("query")}
+						placeholder="Topic/URL/CommitID"
+						required
+						onFocus={() => setError("")}
+					/>
+					<Button type="submit" className="bg-indigo-500">
+						Search
+					</Button>
 				</div>
+				{error && (
+					<div className="p-2 text-red-600 text-sm">
+						<p>{error}</p>
+					</div>
+				)}
+			</form>
+			{hasNoResults && (
+				<ul className="py-1 px-4 text-xs text-muted-foreground list-disc">
+					<p>e.g.</p>
+					<li>
+						Topic:{" "}
+						<span className="italic font-semibold font-sans">
+							expand-248-uk-address-lookup
+						</span>
+					</li>
+					<li>
+						URL:{" "}
+						<span className="italic font-semibold font-sans">
+							https://gerrit.dev.benon.com/c/admin-ui/+/124403
+						</span>
+					</li>
+					<li className="break-all">
+						Commit SHA:{" "}
+						<span className="italic font-semibold font-sans">
+							3c7a4f7054f73659595d8b974373352aba0a7d53
+						</span>
+					</li>
+				</ul>
 			)}
-		</form>
+		</>
 	);
 };
 

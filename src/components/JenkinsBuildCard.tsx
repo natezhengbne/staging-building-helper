@@ -28,7 +28,7 @@ export const JenkinsBuildCard = () => {
 		setError("");
 		const [jenkinsTab] = await getCurrentJenkinsPageTab();
 		if (!jenkinsTab || !jenkinsTab.id) {
-			setError("should use it in Pipeline build page");
+			setError("Run it on the Jenkins Pipeline build page");
 			return;
 		}
 
@@ -87,7 +87,7 @@ export const JenkinsBuildCard = () => {
 				</Button>
 			</div>
 			{error && (
-				<div className="p-2 text-red-600 text-sm">
+				<div className="p-2 text-red-600 text-sm text-end">
 					<p>{error}</p>
 				</div>
 			)}

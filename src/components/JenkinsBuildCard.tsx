@@ -162,7 +162,7 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 			<div className="grow grid">
 				<label
 					htmlFor={checkboxId}
-					className="text-xs font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 truncate"
+					className="text-xs font-medium cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70 truncate"
 				>
 					{changeInfo.subject}
 				</label>

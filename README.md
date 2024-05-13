@@ -18,10 +18,13 @@ This Chrome extension simplifies filling the image tag in Jenkins pipeline build
 
 ## Installation:
 
-- Download the extension.
-- Go to chrome://extensions in your Chrome browser.
-- Enable "Developer mode" in the top-right corner.
-- Click the Load unpacked button and select the extension directory
+- Download the extension or run `npm i; npm run build`.
+- Go to chrome://extensions in your Chrome browser and enable "Developer mode" in the top-right corner.
+![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/75136843-aa55-4459-a5a4-5ac647b7c028)
+- Click the Load unpacked button and select the extension directory.
+![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/b83c4bd5-cc6f-457d-948a-b98010466d34)
+![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/fa54290c-7368-4bfd-9fe6-3b2dccd9280e)
+![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/1ad601c2-f7db-4b51-9e89-cf3078b8c59f)
 
 ## Example:
 

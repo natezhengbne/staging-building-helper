@@ -21,5 +21,8 @@
     },
     "GERRIT_API": {
         "REST_CHANGES": "https://gerrit.dev.benon.com/changes"
+    },
+    "JENKINS": {
+        "CLUSTER_PIPELINE_SITE": "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/build"
     }
 }

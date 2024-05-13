@@ -21,7 +21,7 @@ export const SearchBar = () => {
 	);
 	const resetSelection = useResetAtom(selectedRevisionsAtom);
 
-	const [error, setError] = useState("");
+	const [error, setError] = useState<string | React.ReactNode>("");
 	const hasNoResults =
 		!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0;
 
@@ -41,13 +41,37 @@ export const SearchBar = () => {
 		setError("");
 		const [tab] = await getCurrentJenkinsPageTab();
 		if (!tab) {
-			setError("It is designed to be used on the Jenkins pipeline build page");
+			setError(
+				<span>
+					{"It is designed to be used on the "}
+					<a
+						className="underline font-semibold font-sans"
+						target="_blank"
+						href={permissionConfig.JENKINS.CLUSTER_PIPELINE_SITE}
+					>
+						Jenkins pipeline build page
+					</a>
+				</span>
+			);
 			return;
 		}
 
 		const accessToken = await getGerritAccessTokenFromCookie();
 		if (!accessToken) {
 			setError("The Gerrit access token is unreachable");
+			setError(
+				<span>
+					{"The "}
+					<a
+						className="underline font-semibold font-sans"
+						target="_blank"
+						href={permissionConfig.GERRIT_WEB.ORIGIN_HTTPS}
+					>
+						Gerrit
+					</a>
+					{" access token is unreachable"}
+				</span>
+			);
 			return;
 		}
 

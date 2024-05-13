@@ -1,7 +1,9 @@
+import { permissionConfig } from "@/src/permissions";
+
 export const getCurrentJenkinsPageTab = async () => {
-    return chrome.tabs.query({
+	return chrome.tabs.query({
 		active: true,
 		lastFocusedWindow: true,
-		url: "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/build*",
+		url: `${permissionConfig.JENKINS.CLUSTER_PIPELINE_SITE}*`,
 	});
-}
+};

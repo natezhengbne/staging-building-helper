@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 export const JenkinsBuildCard = () => {
 	const projects = useAtomValue(changeInfoProjectsAtom);
 	const resetProjects = useResetAtom(changeInfoProjectsAtom);
+	const resetSelection = useResetAtom(selectedRevisionsAtom);
 
 	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
 	const [error, setError] = useState("");
@@ -51,6 +52,7 @@ export const JenkinsBuildCard = () => {
 
 	const handleClearAll = () => {
 		resetProjects();
+		resetSelection();
 	};
 
 	if (!projects || Object.keys(projects).length <= 0) {
@@ -145,7 +147,8 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 		changeInfo.revisions &&
 		changeInfo.revisions[changeInfo.current_revision]?.created;
 	const createdTime =
-		created && dayjs(created).add(dayjs().utcOffset(), "m").format("DDMMM HH:mm");
+		created &&
+		dayjs(created).add(dayjs().utcOffset(), "m").format("DDMMM HH:mm");
 
 	const isCiPassed = isCommitCiVerified(changeInfo);
 
@@ -174,7 +177,9 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 							<p className="text-xs text-green-500 font-medium">CI</p>
 						)}
 						<Separator orientation="vertical" />
-						<span className="text-xs text-muted-foreground font-mono">{createdTime}</span>
+						<span className="text-xs text-muted-foreground font-mono">
+							{createdTime}
+						</span>
 					</div>
 				</div>
 			</div>
@@ -183,6 +188,18 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 };
 
 const runPopulateFieldsScripts = (jenkinsBuildInfo: JenkinsBuildInfo) => {
+	const populateInputField = (label: string, value: string) => {
+		const [node] = document.querySelectorAll(`input[value="${label}"]`);
+		if (node) {
+			const inputField = node.nextElementSibling as HTMLInputElement;
+			if (inputField) {
+				inputField.value = value;
+				// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
+				inputField.style = "color: white; background-color: blue";
+			}
+		}
+	};
+
 	jenkinsBuildInfo.imageTags.forEach((imageTag) => {
 		populateInputField(imageTag.fieldLabel, imageTag.tag);
 	});
@@ -193,18 +210,6 @@ const runPopulateFieldsScripts = (jenkinsBuildInfo: JenkinsBuildInfo) => {
 
 	if (jenkinsBuildInfo.cluster) {
 		populateInputField("CLUSTER_NAME", jenkinsBuildInfo.cluster);
-	}
-};
-
-const populateInputField = (label: string, value: string) => {
-	const [node] = document.querySelectorAll(`input[value="${label}"]`);
-	if (node) {
-		const inputField = node.nextElementSibling as HTMLInputElement;
-		if (inputField) {
-			inputField.value = value;
-			// @ts-expect-error: it is possible to set an inline style by assigning a string directly to the style property
-			inputField.style = "color: white; background-color: blue";
-		}
 	}
 };
 

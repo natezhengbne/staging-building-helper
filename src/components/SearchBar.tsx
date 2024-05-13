@@ -1,13 +1,14 @@
 import { GerritChangeInfo, GerritChangeInfoProjects } from "@/src/types";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAtom } from "jotai";
-import { changeInfoProjectsAtom } from "@/src/store";
+import { changeInfoProjectsAtom, selectedRevisionsAtom } from "@/src/store";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { gerritChangeInfoProjectsData } from "../fixture";
 import { useEffect, useState } from "react";
 import { getCurrentJenkinsPageTab } from "../chromeHelpers";
 import { permissionConfig } from "@/src/permissions";
+import { useResetAtom } from "jotai/utils";
 
 type SearchForm = {
 	query: string;
@@ -18,6 +19,8 @@ export const SearchBar = () => {
 	const [changeInfoProjects, setChangeInfoProjects] = useAtom(
 		changeInfoProjectsAtom
 	);
+	const resetSelection = useResetAtom(selectedRevisionsAtom);
+
 	const [error, setError] = useState("");
 	const hasNoResults =
 		!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0;
@@ -70,6 +73,7 @@ export const SearchBar = () => {
 				}
 			});
 			setChangeInfoProjects(changeInfoProjects);
+			resetSelection();
 		} else {
 			setError("No Gerrit patches match your search");
 		}

@@ -11,7 +11,7 @@ export const changeInfoProjectsAtom = atomWithReset<GerritChangeInfoProjects>(
 	{}
 );
 
-export const selectedRevisionsAtom = atom<SelectedRevisions>({});
+export const selectedRevisionsAtom = atomWithReset<SelectedRevisions>({});
 export const selectedSiteAtom = atom<string>("");
 export const selectedClusterNameAtom = atom<string>("");
 export const selectedClusterIdAtom = atom<string>("");

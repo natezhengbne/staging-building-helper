@@ -204,15 +204,15 @@ const queryClustersStatus = async (
 };
 
 const CLUSTER_NAMES = [
-	"rocket",
-	"handy",
 	"agrajag",
 	"fire",
 	"frontier",
+	"handy",
 	"hydra",
 	"mutants",
 	"nightly",
 	"sanic",
+	"rocket",
 	"zim",
 ] as const;
 const CLUSTER_IDS = ["1", "2", "3", "4", "5", "6"] as const;

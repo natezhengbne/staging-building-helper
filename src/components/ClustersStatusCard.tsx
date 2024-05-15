@@ -100,19 +100,22 @@ const StagingRefreshingStatus = () => {
 	const [error, setError] = useState("");
 
 	const handleRefresh = useCallback(async () => {
-		setIsRefreshing(true);
 		const tab = await getServiceStatusPageTab();
 		if (!tab || !tab.id) {
-			setError("You need to open service-status to refresh.");
+			setError(
+				"You need to open this service-status page to obtain access authorization"
+			);
 			return;
 		}
 
 		const token = await getAuthenticationsFromServiceStatus(tab.id);
 		if (!token) {
-			setError("You need to login service-status to refresh.");
+			setError("You need to login service-status.");
 			return;
 		}
 
+		setError("");
+		setIsRefreshing(true);
 		const clustersStatus = await queryClustersStatus(token);
 		setUnavailableClusters(new Set(""));
 
@@ -162,7 +165,7 @@ const StagingRefreshingStatus = () => {
 				Refresh
 			</Button>
 			{error && (
-				<div className="p-2 text-red-600 text-sm">
+				<div className="text-red-600 text-sm">
 					<p>{error}</p>
 				</div>
 			)}

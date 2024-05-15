@@ -4,7 +4,7 @@ import {
 	JenkinsBuildInfo,
 	JenkinsImageTag,
 	SelectedRevisions,
-	UnavailableStagings,
+	UnavailableClusters,
 } from "@/src/types";
 import { atomWithReset } from "jotai/utils";
 
@@ -65,5 +65,7 @@ const gerritProjectJenkinsImageFieldNameMapping: { [project: string]: string } =
 		web: "WEBUI_IMAGE_TAG",
 	};
 
-export const unavailableStagingsAtom = atom<UnavailableStagings>([]);
+// ["Staging1", "rocket1"]
+export const unavailableClustersAtom = atomWithReset<UnavailableClusters>(new Set(""));
+
 export const stagingsStatusLastRefreshTimeAtom = atom<Date | undefined>(undefined);

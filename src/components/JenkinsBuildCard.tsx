@@ -10,7 +10,7 @@ import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { SiteCard } from "@/src/components/SiteCard";
 import { Separator } from "@/src/components/ui/separator";
-import { ClusterNameCard } from "./ClusterNameCard";
+import { ClusterStatusCard } from "./ClustersStatusCard";
 import { getCurrentJenkinsPageTab } from "@/src/chromeHelpers";
 import { useState } from "react";
 import { useResetAtom } from "jotai/utils";
@@ -77,7 +77,7 @@ export const JenkinsBuildCard = () => {
 			<Separator className="my-3" />
 			<SiteCard />
 			<Separator className="my-3" />
-			<ClusterNameCard />
+			<ClusterStatusCard />
 			<div className="mt-6 flex justify-end gap-4">
 				<Button size="sm" className="bg-indigo-500" onClick={handlePrefill}>
 					Prefill

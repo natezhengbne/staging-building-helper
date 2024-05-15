@@ -43,7 +43,7 @@ export type JenkinsBuildInfo = {
 	imageTags: JenkinsImageTag[];
 };
 
-export type UnavailableStagings = string[];
+export type UnavailableClusters = Set<string>; //rocket1
 
 export type ServiceStatusSiteAuthentication = {
 	token: string;
@@ -51,10 +51,10 @@ export type ServiceStatusSiteAuthentication = {
 };
 
 export type StagingsClusterStatus = {
-	name: string;
+	name: string; // Staging1
 	builds?: [
 		{
-			name: string;
+			name: string; //rocket1
 			pbj: string;
 			expires: string; // 2024-05-04T04:01:27+10:00
 		},

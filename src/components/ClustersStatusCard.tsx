@@ -3,8 +3,8 @@ import { Badge } from "./ui/badge";
 import {
 	selectedClusterNameAtom,
 	selectedClusterIdAtom,
-	unavailableStagingsAtom,
 	stagingsStatusLastRefreshTimeAtom,
+	unavailableClustersAtom,
 } from "../store";
 import { useCallback, useEffect, useState } from "react";
 import { getServiceStatusPageTab } from "../chromeHelpers";
@@ -16,12 +16,13 @@ import {
 import dayjs from "dayjs";
 import { Button } from "./ui/button";
 
-export const ClusterNameCard = () => {
+export const ClusterStatusCard = () => {
 	const [selectedCluster, setSelectedCluster] = useAtom(
 		selectedClusterNameAtom
 	);
 	const [selectedId, setSelectedId] = useAtom(selectedClusterIdAtom);
-	const unavailableStagings = useAtomValue(unavailableStagingsAtom);
+	const unavailableClusters = useAtomValue(unavailableClustersAtom);
+
 	const stagingsStatusLastRefreshTime = useAtomValue(
 		stagingsStatusLastRefreshTimeAtom
 	);
@@ -58,17 +59,17 @@ export const ClusterNameCard = () => {
 						);
 					})}
 				</div>
-				<div className="flex gap-1 flex-wrap">
+				<div className="flex gap-2 flex-wrap">
 					{CLUSTER_IDS.map((clusterId) => {
 						const isAvailable =
 							stagingsStatusLastRefreshTime &&
-							!unavailableStagings.includes(`${selectedCluster}${clusterId}`);
+							!unavailableClusters.has(`${selectedCluster}${clusterId}`) &&
+							!unavailableClusters.has(`Staging${clusterId}`);
 
 						return (
-							<div className="relative">
+							<div key={clusterId} className="relative">
 								<Badge
 									className={"cursor-pointer "}
-									key={clusterId}
 									variant={selectedId === clusterId ? "default" : "outline"}
 									onClick={() => setSelectedId(clusterId)}
 								>
@@ -93,7 +94,8 @@ export const ClusterNameCard = () => {
 const StagingRefreshingStatus = () => {
 	const [stagingsStatusLastRefreshTime, setStagingsStatusLastRefreshTime] =
 		useAtom(stagingsStatusLastRefreshTimeAtom);
-	const setUnavailableStagings = useSetAtom(unavailableStagingsAtom);
+	const setUnavailableClusters = useSetAtom(unavailableClustersAtom);
+
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [error, setError] = useState("");
 
@@ -112,19 +114,26 @@ const StagingRefreshingStatus = () => {
 		}
 
 		const clustersStatus = await queryClustersStatus(token);
+		setUnavailableClusters(new Set(""));
 
 		clustersStatus.forEach((staging) => {
+			let currentStagingClustersCount = 0;
+			const maxClustersForSlot = 4;
 			staging.builds?.forEach((cluster) => {
 				const expires = dayjs(cluster.expires);
 
 				if (expires.isAfter(dayjs())) {
-					setUnavailableStagings((curr) => [...curr, cluster.name]);
+					currentStagingClustersCount++;
+					setUnavailableClusters((curr) => curr.add(cluster.name));
 				}
 			});
+			if (currentStagingClustersCount === maxClustersForSlot) {
+				setUnavailableClusters((curr) => curr.add(staging.name));
+			}
 		});
 		setStagingsStatusLastRefreshTime(new Date());
 		setIsRefreshing(false);
-	}, [setStagingsStatusLastRefreshTime, setUnavailableStagings]);
+	}, [setStagingsStatusLastRefreshTime, setUnavailableClusters]);
 
 	useEffect(() => {
 		handleRefresh();

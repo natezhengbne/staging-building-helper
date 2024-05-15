@@ -18,10 +18,10 @@ export type GerritChangeInfo = {
 				{
 					label: string;
 					status: string;
-				}
-			]
-		}
-	]
+				},
+			];
+		},
+	];
 };
 
 export type GerritChangeInfoProjects = {
@@ -41,4 +41,22 @@ export type JenkinsBuildInfo = {
 	site?: string;
 	cluster?: string;
 	imageTags: JenkinsImageTag[];
+};
+
+export type UnavailableStagings = string[];
+
+export type ServiceStatusSiteAuthentication = {
+	token: string;
+	expire: string;
+};
+
+export type StagingsClusterStatus = {
+	name: string;
+	builds?: [
+		{
+			name: string;
+			pbj: string;
+			expires: string; // 2024-05-04T04:01:27+10:00
+		},
+	];
 };

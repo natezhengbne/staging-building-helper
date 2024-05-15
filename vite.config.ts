@@ -11,7 +11,7 @@ export default defineConfig(() => {
 	const chromeManifest = {
 		...manifest,
 		host_permissions: permissions.CHROME_MANIFEST.HOST_PERMISSIONS,
-    permissions: permissions.CHROME_MANIFEST.PERMISSIONS
+		permissions: permissions.CHROME_MANIFEST.PERMISSIONS,
 	};
 
 	return {

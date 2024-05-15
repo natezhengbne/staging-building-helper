@@ -153,7 +153,7 @@ export const SearchBar = () => {
 const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
 	const result = await chrome.cookies.getAll({
 		domain: permissionConfig.GERRIT_WEB.DOMAIN,
-		name: permissionConfig.GERRIT_WEB.COOKIE_NAME_ACCESS_TOKEN,
+		name: permissionConfig.GERRIT_WEB.COOKIE_ACCESS_TOKEN,
 	});
 	if (result && result.length > 0) {
 		return result[0].value;

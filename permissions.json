@@ -16,7 +16,7 @@
     },
     "GERRIT_WEB": {
         "DOMAIN": "gerrit.dev.benon.com",
-        "COOKIE_NAME_ACCESS_TOKEN": "GerritAccount",
+        "COOKIE_ACCESS_TOKEN": "GerritAccount",
         "ORIGIN_HTTPS": "https://gerrit.dev.benon.com"
     },
     "GERRIT_API": {
@@ -24,5 +24,9 @@
     },
     "JENKINS": {
         "CLUSTER_PIPELINE_SITE": "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/build"
+    },
+    "SERVICE_STATUS": {
+        "ORIGIN_HTTPS": "https://service-status.dev.benon.com",
+        "REST_CLUSTERS": "https://service-status.dev.benon.com/api/v1/staging/clusters"
     }
 }

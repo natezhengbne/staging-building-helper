@@ -138,16 +138,16 @@ const StagingRefreshingStatus = () => {
 		setIsRefreshing(false);
 	}, [setStagingsStatusLastRefreshTime, setUnavailableClusters]);
 
-	useEffect(() => {
-		handleRefresh();
-	}, [handleRefresh]);
-
 	return (
 		<div className="px-2 text-xs text-muted-foreground">
 			<span>
 				Last refreshed:{" "}
 				{!isRefreshing ? (
-					dayjs(stagingsStatusLastRefreshTime).format("HH:mm:ss")
+					stagingsStatusLastRefreshTime ? (
+						dayjs(stagingsStatusLastRefreshTime).format("HH:mm:ss")
+					) : (
+						"n/a"
+					)
 				) : (
 					<span className="text-xs animate-pulse">Refreshing now</span>
 				)}

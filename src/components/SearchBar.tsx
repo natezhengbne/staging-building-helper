@@ -6,7 +6,6 @@ import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { gerritChangeInfoProjectsData } from "../fixture";
 import { useEffect, useState } from "react";
-import { getCurrentJenkinsPageTab } from "../chromeHelpers";
 import { permissionConfig } from "@/src/permissions";
 import { useResetAtom } from "jotai/utils";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
@@ -52,23 +51,6 @@ export const SearchBar = () => {
 			return;
 		}
 		setError("");
-		const [tab] = await getCurrentJenkinsPageTab();
-		if (!tab) {
-			setError(
-				<span>
-					{"It is designed to be used on the "}
-					<a
-						className="underline font-semibold font-sans"
-						target="_blank"
-						href={permissionConfig.JENKINS.CLUSTER_PIPELINE_SITE}
-					>
-						Jenkins pipeline build page
-					</a>
-				</span>
-			);
-			return;
-		}
-
 		const accessToken = await getGerritAccessTokenFromCookie();
 		if (!accessToken) {
 			setError("The Gerrit access token is unreachable");

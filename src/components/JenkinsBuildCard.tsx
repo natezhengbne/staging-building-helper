@@ -15,6 +15,7 @@ import { getCurrentJenkinsPageTab } from "@/src/chromeHelpers";
 import { useState } from "react";
 import { useResetAtom } from "jotai/utils";
 import dayjs from "dayjs";
+import { permissionConfig } from "@/src/permissions";
 
 export const JenkinsBuildCard = () => {
 	const projects = useAtomValue(changeInfoProjectsAtom);
@@ -22,13 +23,24 @@ export const JenkinsBuildCard = () => {
 	const resetSelection = useResetAtom(selectedRevisionsAtom);
 
 	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
-	const [error, setError] = useState("");
+	const [error, setError] = useState<string | React.ReactNode>("");
 
 	const handlePrefill = async () => {
 		setError("");
 		const [jenkinsTab] = await getCurrentJenkinsPageTab();
 		if (!jenkinsTab || !jenkinsTab.id) {
-			setError("Run it on the Jenkins Pipeline build page");
+			setError(
+				<span>
+					{"Run it on the "}
+					<a
+						className="underline font-semibold font-sans"
+						target="_blank"
+						href={permissionConfig.JENKINS.CLUSTER_PIPELINE_SITE}
+					>
+						Jenkins pipeline build page
+					</a>
+				</span>
+			);
 			return;
 		}
 

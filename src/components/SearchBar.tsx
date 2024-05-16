@@ -9,17 +9,25 @@ import { useEffect, useState } from "react";
 import { getCurrentJenkinsPageTab } from "../chromeHelpers";
 import { permissionConfig } from "@/src/permissions";
 import { useResetAtom } from "jotai/utils";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { Bird } from "lucide-react";
+import { GitGraph } from "lucide-react";
+import { X } from "lucide-react";
+type SearchType = "topic" | "revision";
 
 type SearchForm = {
 	query: string;
 };
 
 export const SearchBar = () => {
-	const { register, handleSubmit, reset, getValues } = useForm<SearchForm>();
+	const { register, handleSubmit, reset, getValues, watch } = useForm<SearchForm>();
+	const searchInput = watch("query");
+
 	const [changeInfoProjects, setChangeInfoProjects] = useAtom(
 		changeInfoProjectsAtom
 	);
 	const resetSelection = useResetAtom(selectedRevisionsAtom);
+	const [activeTab, setActiveTab] = useState<SearchType>("topic");
 
 	const [error, setError] = useState<string | React.ReactNode>("");
 	const hasNoResults =
@@ -32,6 +40,11 @@ export const SearchBar = () => {
 			}
 		}
 	}, [hasNoResults, getValues, reset]);
+
+	const handleClean = () => {
+		reset();
+		setError("");
+	};
 
 	const onSubmit: SubmitHandler<SearchForm> = async (data) => {
 		if (data.query === "111") {
@@ -77,7 +90,11 @@ export const SearchBar = () => {
 
 		let changeInfos: GerritChangeInfo[] = [];
 		try {
-			changeInfos = await queryGerritChangeInfos(accessToken, data.query);
+			changeInfos = await queryGerritChangeInfos(
+				accessToken,
+				data.query,
+				activeTab
+			);
 		} catch (e) {
 			if (e instanceof Error) {
 				setError(e.message);
@@ -104,15 +121,45 @@ export const SearchBar = () => {
 	};
 
 	return (
-		<>
+		<Tabs
+			defaultValue="topic"
+			onValueChange={(value) => setActiveTab(value as SearchType)}
+		>
+			<TabsList className="grid w-full grid-cols-2 mb-1">
+				<TabsTrigger value="topic">
+					<div className="flex gap-1 items-center hover:animate-pulse">
+						<Bird size={16} />
+						<span>Topic</span>
+					</div>
+				</TabsTrigger>
+				<TabsTrigger value="revision">
+					<div className="flex gap-1 items-center hover:animate-pulse">
+						<GitGraph size={16} />
+						<span>Revision</span>
+					</div>
+				</TabsTrigger>
+			</TabsList>
 			<form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
 				<div className="flex w-full items-center space-x-2">
-					<Input
-						autoFocus
-						{...register("query")}
-						placeholder="Topic/URL/CommitID"
-						required
-					/>
+					<div className="grow relative">
+						<Input
+							className="pr-8"
+							autoFocus
+							{...register("query")}
+							required
+						/>
+						{!!searchInput && (
+							<div
+								className="absolute top-0 right-0 h-full flex flex-col justify-center mx-1 cursor-pointer"
+								onClick={handleClean}
+							>
+								<X
+									strokeWidth={1}
+									className="h-6 w-6 rounded-full hover:bg-orange-100 p-1"
+								/>
+							</div>
+						)}
+					</div>
 					<Button type="submit" className="bg-indigo-500">
 						Search
 					</Button>
@@ -124,29 +171,34 @@ export const SearchBar = () => {
 				)}
 			</form>
 			{hasNoResults && (
-				<ul className="py-1 px-4 text-xs text-muted-foreground list-disc">
-					<p>e.g.</p>
-					<li>
+				<ul className="py-2 px-2 text-xs text-muted-foreground list-disc">
+					<p className="text-xs">Search Example:</p>
+					<li className="list-inside">
 						Topic:{" "}
 						<span className="italic font-semibold font-sans">
 							expand-248-uk-address-lookup
 						</span>
 					</li>
-					<li>
+					<p className="text-xs">Revision:</p>
+					<li className="list-inside">
 						URL:{" "}
 						<span className="italic font-semibold font-sans">
-							https://gerrit.dev.benon.com/c/admin-ui/+/124403
+							https://GERRIT_DOMAIN/c/admin-ui/+/124403
 						</span>
 					</li>
-					<li className="break-all">
-						Commit SHA:{" "}
+					<li className="list-inside break-all">
+						SHA:{" "}
 						<span className="italic font-semibold font-sans">
 							3c7a4f7054f73659595d8b974373352aba0a7d53
 						</span>
 					</li>
+					<li className="list-inside break-all">
+						Change ID:{" "}
+						<span className="italic font-semibold font-sans">127346</span>
+					</li>
 				</ul>
 			)}
-		</>
+		</Tabs>
 	);
 };
 
@@ -164,35 +216,33 @@ const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
 
 const queryGerritChangeInfos = async (
 	accessToken: string,
-	query: string
+	query: string,
+	type: SearchType
 ): Promise<GerritChangeInfo[]> => {
 	let gerritQueryParameter = "";
 
-	// handle url: https://gerrit.dev.benon.com/c/admin-ui/+/124403
-	try {
-		const url = new URL(query);
-		if (url.origin === permissionConfig.GERRIT_WEB.ORIGIN_HTTPS) {
-			const pathNames = url.pathname.split("/");
-			const idNumber = pathNames[pathNames.length - 1];
-			const isNumber = /^\d+$/.test(idNumber);
-			if (isNumber) {
-				gerritQueryParameter = `change:${idNumber}`;
-			}
-		} else {
-			return Promise.reject(new Error("The Gerrit URL is invalid"));
-		}
-	} catch (e) {
-		// do nothing
-	}
-
-	// handle SHA: 3c7a4f7054f73659595d8b974373352aba0a7d53
-	if (!gerritQueryParameter && /\b([a-f0-9]{40})\b/.test(query)) {
-		gerritQueryParameter = query;
-	}
-
-	// handle topic: expand-248-uk-address-lookup
-	if (!gerritQueryParameter) {
+	if (type === "topic") {
+		// handle topic: expand-248-uk-address-lookup
 		gerritQueryParameter = `topic:${query}`;
+	} else if (type === "revision") {
+		// handle url: https://gerrit.dev.benon.com/c/admin-ui/+/124403
+		try {
+			const url = new URL(query);
+			if (url.origin === permissionConfig.GERRIT_WEB.ORIGIN_HTTPS) {
+				const pathNames = url.pathname.split("/");
+				const idNumber = pathNames[pathNames.length - 1];
+				const isNumber = /^\d+$/.test(idNumber);
+				if (isNumber) {
+					gerritQueryParameter = `change:${idNumber}`;
+				}
+			} else {
+				return Promise.reject(new Error("The Gerrit patch URL is invalid"));
+			}
+		} catch (e) {
+			// handle SHA: 3c7a4f7054f73659595d8b974373352aba0a7d53
+			// handle changId: 124403
+			gerritQueryParameter = query;
+		}
 	}
 
 	if (!gerritQueryParameter) {

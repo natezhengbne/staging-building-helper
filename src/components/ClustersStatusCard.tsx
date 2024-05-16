@@ -103,7 +103,7 @@ const StagingRefreshingStatus = () => {
 		const tab = await getServiceStatusPageTab();
 		if (!tab || !tab.id) {
 			setError(
-				"You need to open this service-status page to obtain access authorization"
+				"You need to open the service-status page to obtain access authorization"
 			);
 			return;
 		}

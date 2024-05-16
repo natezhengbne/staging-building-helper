@@ -60,6 +60,8 @@ const gerritProjectJenkinsImageFieldNameMapping: { [project: string]: string } =
 		hermes: "HERMES_IMAGE_TAG",
 		jl: "JL_CMD_IMAGE_TAG",
 		"jl-db-update": "JL_DB_UPDATE_IMAGE_TAG",
+		"cp-kafka": "KAFKA_IMAGE_TAG",
+		"kafka-topics": "KAFKA_TOPICS_IMAGE_TAG",
 		"msg-filestore": "MSG_FILESTORE_IMAGE_TAG",
 		ruth: "RUTH_IMAGE_TAG",
 		web: "WEBUI_IMAGE_TAG",

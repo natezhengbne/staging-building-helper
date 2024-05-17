@@ -91,7 +91,7 @@ export const JenkinsBuildCard = () => {
 			<SiteCard />
 			<Separator className="my-3" />
 			<ClusterStatusCard />
-			<div className="mt-6 flex justify-end gap-4">
+			<div className="mt-4 flex justify-end gap-4">
 				<Button size="sm" className="bg-indigo-500" onClick={handlePrefill}>
 					Prefill
 				</Button>
@@ -100,8 +100,8 @@ export const JenkinsBuildCard = () => {
 				</Button>
 			</div>
 			{error && (
-				<div className="p-2 text-red-600 text-sm text-end">
-					<p>{error}</p>
+				<div className="p-1 text-red-600 text-xs text-end">
+					{error}
 				</div>
 			)}
 		</div>

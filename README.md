@@ -1,6 +1,7 @@
 # Jenkins Pipeline Building Form Helper - Chrome Extension
 
-This Chrome extension simplifies filling the image tag in Jenkins pipeline building forms by leveraging topic searches in Gerrit.
+This Chrome extension streamlines the workflow by populating Gerrit patch commit revisions within Jenkins pipeline building form. 
+This reduces manual data entry and potential errors, improving developer efficiency.
 
 ## Features:
 

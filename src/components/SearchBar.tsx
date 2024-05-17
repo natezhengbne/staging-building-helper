@@ -19,7 +19,8 @@ type SearchForm = {
 };
 
 export const SearchBar = () => {
-	const { register, handleSubmit, reset, getValues, watch } = useForm<SearchForm>();
+	const { register, handleSubmit, reset, getValues, watch } =
+		useForm<SearchForm>();
 	const searchInput = watch("query");
 
 	const [changeInfoProjects, setChangeInfoProjects] = useAtom(
@@ -124,12 +125,7 @@ export const SearchBar = () => {
 			<form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
 				<div className="flex w-full items-center space-x-2">
 					<div className="grow relative">
-						<Input
-							className="pr-8"
-							autoFocus
-							{...register("query")}
-							required
-						/>
+						<Input className="pr-8" autoFocus {...register("query")} required />
 						{!!searchInput && (
 							<div
 								className="absolute top-0 right-0 h-full flex flex-col justify-center mx-1 cursor-pointer"
@@ -177,6 +173,10 @@ export const SearchBar = () => {
 					<li className="list-inside break-all">
 						Change ID:{" "}
 						<span className="italic font-semibold font-sans">127346</span>
+					</li>
+					<li className="list-inside break-all">
+						Jira:{" "}
+						<span className="italic font-semibold font-sans">INCIDENT-621</span>
 					</li>
 				</ul>
 			)}

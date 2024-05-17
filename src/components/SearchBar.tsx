@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { Bird } from "lucide-react";
 import { GitGraph } from "lucide-react";
 import { X } from "lucide-react";
+import { fetchGerritChangeInfos } from "../utils/gerritHelpers";
 
 type SearchType = "topic" | "revision";
 
@@ -55,30 +56,13 @@ export const SearchBar = () => {
 		setError("");
 		const accessToken = await getGerritAccessTokenFromCookie();
 		if (!accessToken) {
-			setError("The Gerrit access token is unreachable");
-			setError(
-				<span>
-					{"The "}
-					<a
-						className="underline font-semibold font-sans"
-						target="_blank"
-						href={permissionConfig.GERRIT_WEB.ORIGIN_HTTPS}
-					>
-						Gerrit
-					</a>
-					{" access token is unreachable"}
-				</span>
-			);
+			setError(<GerritTokenUnreachable />);
 			return;
 		}
 
 		let changeInfos: GerritChangeInfo[] = [];
 		try {
-			changeInfos = await queryGerritChangeInfos(
-				accessToken,
-				data.query,
-				activeTab
-			);
+			changeInfos = await queryGerrit(accessToken, data.query, activeTab);
 		} catch (e) {
 			if (e instanceof Error) {
 				setError(e.message);
@@ -166,20 +150,20 @@ const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
 	return null;
 };
 
-const queryGerritChangeInfos = async (
+const queryGerrit = async (
 	accessToken: string,
-	query: string,
+	queryContent: string,
 	type: SearchType
 ): Promise<GerritChangeInfo[]> => {
 	let gerritQueryParameter = "";
 
 	if (type === "topic") {
 		// handle topic: expand-248-uk-address-lookup
-		gerritQueryParameter = `topic:${query}`;
+		gerritQueryParameter = `topic:${queryContent}`;
 	} else if (type === "revision") {
 		// handle url: https://gerrit.dev.benon.com/c/admin-ui/+/124403
 		try {
-			const url = new URL(query);
+			const url = new URL(queryContent);
 			if (url.origin === permissionConfig.GERRIT_WEB.ORIGIN_HTTPS) {
 				const pathNames = url.pathname.split("/");
 				const idNumber = pathNames[pathNames.length - 1];
@@ -193,7 +177,7 @@ const queryGerritChangeInfos = async (
 		} catch (e) {
 			// handle SHA: 3c7a4f7054f73659595d8b974373352aba0a7d53
 			// handle changId: 124403
-			gerritQueryParameter = query;
+			gerritQueryParameter = queryContent;
 		}
 	}
 
@@ -201,30 +185,7 @@ const queryGerritChangeInfos = async (
 		return Promise.reject(new Error("Query parameter is invalid"));
 	}
 
-	const params = new URLSearchParams({
-		q: gerritQueryParameter,
-		pp: "0",
-		o: "CURRENT_REVISION",
-		access_token: accessToken,
-	});
-
-	const response = await fetch(
-		`${permissionConfig.GERRIT_API.REST_CHANGES}?${params}`
-	);
-
-	if (!response.ok) {
-		return Promise.reject(new Error(`Query failed: ${response.status}`));
-	}
-
-	const body = await response.text();
-	const cleanedBody = body.replace(")]}'", "");
-	if (!cleanedBody || cleanedBody === "[]") {
-		return Promise.reject(
-			new Error("No patches match your search or Gerrit session expired")
-		);
-	}
-
-	return JSON.parse(cleanedBody);
+	return await fetchGerritChangeInfos(accessToken, gerritQueryParameter);
 };
 
 const SearchIntroduction = ({ isDisplay }: { isDisplay: boolean }) => {
@@ -265,5 +226,21 @@ const SearchIntroduction = ({ isDisplay }: { isDisplay: boolean }) => {
 				</li>
 			</ul>
 		</>
+	);
+};
+
+const GerritTokenUnreachable = () => {
+	return (
+		<span>
+			{"The "}
+			<a
+				className="underline font-semibold font-sans"
+				target="_blank"
+				href={permissionConfig.GERRIT_WEB.ORIGIN_HTTPS}
+			>
+				Gerrit
+			</a>
+			{" access token is unreachable"}
+		</span>
 	);
 };

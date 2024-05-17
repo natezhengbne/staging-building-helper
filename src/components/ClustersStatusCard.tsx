@@ -7,7 +7,7 @@ import {
 	unavailableClustersAtom,
 } from "../store";
 import { useCallback, useEffect, useState } from "react";
-import { getServiceStatusPageTab } from "../chromeHelpers";
+import { getServiceStatusPageTab } from "../utils/chromeHelpers";
 import { permissionConfig } from "../permissions";
 import {
 	StagingsClusterStatus,

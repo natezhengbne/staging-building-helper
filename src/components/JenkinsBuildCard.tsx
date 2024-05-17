@@ -11,7 +11,7 @@ import { Badge } from "@/src/components/ui/badge";
 import { SiteCard } from "@/src/components/SiteCard";
 import { Separator } from "@/src/components/ui/separator";
 import { ClusterStatusCard } from "./ClustersStatusCard";
-import { getCurrentJenkinsPageTab } from "@/src/chromeHelpers";
+import { getCurrentJenkinsPageTab } from "@/src/utils/chromeHelpers";
 import { useState } from "react";
 import { useResetAtom } from "jotai/utils";
 import dayjs from "dayjs";
@@ -63,6 +63,7 @@ export const JenkinsBuildCard = () => {
 	};
 
 	const handleClearAll = () => {
+		setError("");
 		resetProjects();
 		resetSelection();
 	};

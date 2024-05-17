@@ -14,7 +14,7 @@ import {
 	ServiceStatusSiteAuthentication,
 } from "../types";
 import dayjs from "dayjs";
-import { Button } from "./ui/button";
+import { RefreshCw } from "lucide-react";
 
 export const ClusterStatusCard = () => {
 	const [selectedCluster, setSelectedCluster] = useAtom(
@@ -139,33 +139,26 @@ const StagingRefreshingStatus = () => {
 	}, [setStagingsStatusLastRefreshTime, setUnavailableClusters]);
 
 	return (
-		<div className="px-2 text-xs text-muted-foreground">
-			<span>
-				Last refreshed:{" "}
-				{!isRefreshing ? (
-					stagingsStatusLastRefreshTime ? (
-						dayjs(stagingsStatusLastRefreshTime).format("HH:mm:ss")
-					) : (
-						"n/a"
-					)
-				) : (
-					<span className="text-xs animate-pulse">Refreshing now</span>
-				)}
-			</span>
-			<Button
-				variant="link"
-				onClick={() => {
-					if (isRefreshing) {
-						return;
+		<div className="p-2">
+			<div className="flex gap-2">
+				<span className="text-xs text-muted-foreground">
+					Last refreshed:{" "}
+					{stagingsStatusLastRefreshTime
+						? dayjs(stagingsStatusLastRefreshTime).format("HH:mm:ss")
+						: "n/a"}
+				</span>
+				<RefreshCw
+					color="green"
+					className={
+						isRefreshing
+							? "animate-spin size-4 cursor-wait"
+							: "size-4 cursor-pointer"
 					}
-					handleRefresh();
-				}}
-				className={isRefreshing ? "text-xs cursor-not-allowed" : "text-xs"}
-			>
-				Refresh
-			</Button>
+					onClick={() => !isRefreshing && handleRefresh()}
+				/>
+			</div>
 			{error && (
-				<div className="text-red-600 text-sm">
+				<div className="mt-2 text-red-600 text-xs">
 					<p>{error}</p>
 				</div>
 			)}

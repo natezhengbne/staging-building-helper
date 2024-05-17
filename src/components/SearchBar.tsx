@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { Bird } from "lucide-react";
 import { GitGraph } from "lucide-react";
 import { X } from "lucide-react";
+
 type SearchType = "topic" | "revision";
 
 type SearchForm = {
@@ -111,13 +112,13 @@ export const SearchBar = () => {
 			<TabsList className="grid w-full grid-cols-2 mb-1">
 				<TabsTrigger value="topic">
 					<div className="flex gap-1 items-center hover:animate-pulse">
-						<Bird size={16} />
+						{activeTab === "topic" && <Bird size={16} />}
 						<span>Topic</span>
 					</div>
 				</TabsTrigger>
 				<TabsTrigger value="revision">
 					<div className="flex gap-1 items-center hover:animate-pulse">
-						<GitGraph size={16} />
+						{activeTab === "revision" && <GitGraph size={16} />}
 						<span>Revision</span>
 					</div>
 				</TabsTrigger>
@@ -148,38 +149,7 @@ export const SearchBar = () => {
 					</div>
 				)}
 			</form>
-			{hasNoResults && (
-				<ul className="py-2 px-2 text-xs text-muted-foreground list-disc">
-					<p className="text-xs">Search Example:</p>
-					<li className="list-inside">
-						Topic:{" "}
-						<span className="italic font-semibold font-sans">
-							expand-248-uk-address-lookup
-						</span>
-					</li>
-					<p className="text-xs">Revision:</p>
-					<li className="list-inside">
-						URL:{" "}
-						<span className="italic font-semibold font-sans">
-							https://GERRIT_DOMAIN/c/admin-ui/+/124403
-						</span>
-					</li>
-					<li className="list-inside break-all">
-						SHA:{" "}
-						<span className="italic font-semibold font-sans">
-							3c7a4f7054f73659595d8b974373352aba0a7d53
-						</span>
-					</li>
-					<li className="list-inside break-all">
-						Change ID:{" "}
-						<span className="italic font-semibold font-sans">127346</span>
-					</li>
-					<li className="list-inside break-all">
-						Jira:{" "}
-						<span className="italic font-semibold font-sans">INCIDENT-621</span>
-					</li>
-				</ul>
-			)}
+			<SearchIntroduction isDisplay={hasNoResults} />
 		</Tabs>
 	);
 };
@@ -255,4 +225,45 @@ const queryGerritChangeInfos = async (
 	}
 
 	return JSON.parse(cleanedBody);
+};
+
+const SearchIntroduction = ({ isDisplay }: { isDisplay: boolean }) => {
+	if (!isDisplay) {
+		return null;
+	}
+
+	return (
+		<>
+			<ul className="py-2 px-2 text-xs text-muted-foreground list-disc">
+				<p className="text-xs">Search Example:</p>
+				<li className="list-inside">
+					Topic:{" "}
+					<span className="italic font-semibold font-sans">
+						expand-248-uk-address-lookup
+					</span>
+				</li>
+				<p className="text-xs">Revision:</p>
+				<li className="list-inside">
+					URL:{" "}
+					<span className="italic font-semibold font-sans">
+						https://GERRIT_DOMAIN/c/admin-ui/+/124403
+					</span>
+				</li>
+				<li className="list-inside break-all">
+					SHA:{" "}
+					<span className="italic font-semibold font-sans">
+						3c7a4f7054f73659595d8b974373352aba0a7d53
+					</span>
+				</li>
+				<li className="list-inside break-all">
+					Change ID:{" "}
+					<span className="italic font-semibold font-sans">127346</span>
+				</li>
+				<li className="list-inside break-all">
+					Jira:{" "}
+					<span className="italic font-semibold font-sans">INCIDENT-621</span>
+				</li>
+			</ul>
+		</>
+	);
 };

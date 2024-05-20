@@ -35,7 +35,7 @@ export const fetchGerritChangeInfos = async (
  * intopic:'TOPIC'
  * If 'TOPIC' starts with ^ it matches topic names by regular expression patterns.
  * https://gerrit-review.googlesource.com/Documentation/user-search.html
- * @param Changes whose designated topic contains 'TOPIC', using a full-text search.
+ * @param topic whose designated topic contains 'TOPIC', using a full-text search.
  */
 export const queryInTopic = (
 	accessToken: string,

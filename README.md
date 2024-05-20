@@ -1,11 +1,12 @@
 # Jenkins Pipeline Building Form Helper - Chrome Extension
 
-This Chrome extension streamlines the workflow by populating Gerrit patch commit revisions within Jenkins pipeline building form. 
+This Chrome extension streamlines the workflow by populating Gerrit patch commit revisions within Jenkins pipeline building form.
 This reduces manual data entry and potential errors, improving developer efficiency.
 
 ## Features:
 
 ### 0.0.1
+
 - Search for patches by topic/URL/CommitID on Gerrit.
   - Topic: expand-248-uk-address-lookup
   - URL: https://gerrit.dev.benon.com/c/admin-ui/+/124403
@@ -14,7 +15,12 @@ This reduces manual data entry and potential errors, improving developer efficie
 - Remember the most recently used site and cluster as the default for the next session.
 
 ### 0.0.2
-- Support query staging cluster status through service service-status
+
+- Support query staging cluster status through service service-status.
+
+### 1.1.0
+
+- Supports searching topics using regular expressions. It equals `intopic:'TOPIC'`, see Gerrit doc here[https://gerrit-review.googlesource.com/Documentation/user-search.html]
 
 ## Limitations:
 
@@ -25,11 +31,11 @@ This reduces manual data entry and potential errors, improving developer efficie
 
 - Download the extension or run `npm i; npm run build`.
 - Go to chrome://extensions in your Chrome browser and enable "Developer mode" in the top-right corner.
-![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/75136843-aa55-4459-a5a4-5ac647b7c028)
+  ![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/75136843-aa55-4459-a5a4-5ac647b7c028)
 - Click the Load unpacked button and select the extension directory.
-![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/b83c4bd5-cc6f-457d-948a-b98010466d34)
-![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/fa54290c-7368-4bfd-9fe6-3b2dccd9280e)
-![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/1ad601c2-f7db-4b51-9e89-cf3078b8c59f)
+  ![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/b83c4bd5-cc6f-457d-948a-b98010466d34)
+  ![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/fa54290c-7368-4bfd-9fe6-3b2dccd9280e)
+  ![image](https://github.com/natezhengbne/staging-building-helper/assets/34373238/1ad601c2-f7db-4b51-9e89-cf3078b8c59f)
 
 ## Example:
 

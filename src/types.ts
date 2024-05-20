@@ -5,6 +5,7 @@ export type GerritChangeInfo = {
 	project: string;
 	status?: string;
 	current_revision: string;
+	topic?: string;
 	revisions?: {
 		[revision: string]: {
 			created: string; // 2024-02-25 23:37:32.000000000
@@ -43,7 +44,8 @@ export type JenkinsBuildInfo = {
 	imageTags: JenkinsImageTag[];
 };
 
-export type UnavailableClusters = Set<string>; //rocket1
+// ["Staging1", "rocket1"]
+export type UnavailableClusters = Set<string>;
 
 export type ServiceStatusSiteAuthentication = {
 	token: string;

@@ -1,6 +1,8 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
-	changeInfoProjectsAtom,
+	
+	changeInfosDisplayAtom,
+	clearChangeInfosAndSelectedRevisionsAtom,
 	jenkinsBuildInfoAtom,
 	selectedRevisionsAtom,
 } from "@/src/store";
@@ -13,14 +15,15 @@ import { Separator } from "@/src/components/ui/separator";
 import { ClusterStatusCard } from "./ClustersStatusCard";
 import { getCurrentJenkinsPageTab } from "@/src/utils/chromeHelpers";
 import { useState } from "react";
-import { useResetAtom } from "jotai/utils";
 import dayjs from "dayjs";
 import { permissionConfig } from "@/src/permissions";
+import { ComponentEvent } from "../constants";
 
 export const JenkinsBuildCard = () => {
-	const projects = useAtomValue(changeInfoProjectsAtom);
-	const resetProjects = useResetAtom(changeInfoProjectsAtom);
-	const resetSelection = useResetAtom(selectedRevisionsAtom);
+	const projects = useAtomValue(changeInfosDisplayAtom);
+	const clearChangeInfosAndSelectedRevisions = useSetAtom(
+		clearChangeInfosAndSelectedRevisionsAtom
+	);
 
 	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
 	const [error, setError] = useState<string | React.ReactNode>("");
@@ -64,8 +67,8 @@ export const JenkinsBuildCard = () => {
 
 	const handleClearAll = () => {
 		setError("");
-		resetProjects();
-		resetSelection();
+		clearChangeInfosAndSelectedRevisions();
+		window.dispatchEvent(new Event(ComponentEvent.ClearAll));
 	};
 
 	if (!projects || Object.keys(projects).length <= 0) {
@@ -100,9 +103,7 @@ export const JenkinsBuildCard = () => {
 				</Button>
 			</div>
 			{error && (
-				<div className="p-1 text-red-600 text-xs text-end">
-					{error}
-				</div>
+				<div className="p-1 text-red-600 text-xs text-end">{error}</div>
 			)}
 		</div>
 	);

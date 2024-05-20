@@ -1,18 +1,22 @@
-import { GerritChangeInfo, GerritChangeInfoProjects } from "@/src/types";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { GerritChangeInfo } from "@/src/types";
+import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
 import { useAtom } from "jotai";
-import { changeInfoProjectsAtom, selectedRevisionsAtom } from "@/src/store";
+import { changeInfosDisplayAtom } from "@/src/store";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
-import { gerritChangeInfoProjectsData } from "../fixture";
-import { useEffect, useState } from "react";
+import { gerritChangeInfos } from "../fixture";
+import { useCallback, useEffect, useState } from "react";
 import { permissionConfig } from "@/src/permissions";
-import { useResetAtom } from "jotai/utils";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { Bird } from "lucide-react";
 import { GitGraph } from "lucide-react";
 import { X } from "lucide-react";
-import { fetchGerritChangeInfos } from "../utils/gerritHelpers";
+import {
+	fetchGerritChangeInfos,
+	getGerritAccessTokenFromCookie,
+} from "../utils/gerritHelpers";
+import { TopicInputSearch } from "./searchBar/TopicInputSearch";
+import { ComponentEvent } from "../constants";
 
 type SearchType = "topic" | "revision";
 
@@ -21,42 +25,34 @@ type SearchForm = {
 };
 
 export const SearchBar = () => {
-	const { register, handleSubmit, reset, getValues, watch } =
-		useForm<SearchForm>();
-	const searchInput = watch("query");
+	const formMethods = useForm<SearchForm>();
+	const searchInput = formMethods.watch("query");
 
 	const [changeInfoProjects, setChangeInfoProjects] = useAtom(
-		changeInfoProjectsAtom
+		changeInfosDisplayAtom
 	);
-	const resetSelection = useResetAtom(selectedRevisionsAtom);
 	const [activeTab, setActiveTab] = useState<SearchType>("topic");
 
 	const [error, setError] = useState<string | React.ReactNode>("");
 	const hasNoResults =
 		!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0;
 
-	useEffect(() => {
-		if (hasNoResults) {
-			if (getValues("query")) {
-				reset();
-			}
-		}
-	}, [hasNoResults, getValues, reset]);
-
 	const handleClean = () => {
-		reset();
+		formMethods.reset();
 		setError("");
 	};
 
 	const onSubmit: SubmitHandler<SearchForm> = async (data) => {
-		if (data.query === "111") {
-			setChangeInfoProjects(gerritChangeInfoProjectsData);
+		if (data.query === "111" && import.meta.env.MODE === "development") {
+			setChangeInfoProjects(gerritChangeInfos);
 			return;
 		}
 		setError("");
-		const accessToken = await getGerritAccessTokenFromCookie();
-		if (!accessToken) {
+		const accessToken = await getGerritAccessTokenFromCookie().catch(() => {
 			setError(<GerritTokenUnreachable />);
+		});
+
+		if (!accessToken) {
 			return;
 		}
 
@@ -72,21 +68,22 @@ export const SearchBar = () => {
 		}
 
 		if (changeInfos && changeInfos.length > 0) {
-			const changeInfoProjects: GerritChangeInfoProjects = {};
-			changeInfos.forEach((changeInfo) => {
-				const project = changeInfoProjects[changeInfo.project];
-				if (project) {
-					project.push(changeInfo);
-				} else {
-					changeInfoProjects[changeInfo.project] = [changeInfo];
-				}
-			});
-			setChangeInfoProjects(changeInfoProjects);
-			resetSelection();
+			setChangeInfoProjects(changeInfos);
 		} else {
 			setError("No Gerrit patches match your search");
 		}
 	};
+
+	const handleClearAll = useCallback(() => {
+		formMethods.reset();
+	}, [formMethods]);
+
+	useEffect(() => {
+		window.addEventListener(ComponentEvent.ClearAll, handleClearAll);
+		return () => {
+			window.removeEventListener(ComponentEvent.ClearAll, handleClearAll);
+		};
+	}, [handleClearAll]);
 
 	return (
 		<Tabs
@@ -107,47 +104,44 @@ export const SearchBar = () => {
 					</div>
 				</TabsTrigger>
 			</TabsList>
-			<form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-				<div className="flex w-full items-center space-x-2">
-					<div className="grow relative">
-						<Input className="pr-8" autoFocus {...register("query")} required />
-						{!!searchInput && (
-							<div
-								className="absolute top-0 right-0 h-full flex flex-col justify-center mx-1 cursor-pointer"
-								onClick={handleClean}
-							>
-								<X
-									strokeWidth={1}
-									className="h-6 w-6 rounded-full hover:bg-orange-100 p-1"
+			<FormProvider {...formMethods}>
+				<form onSubmit={formMethods.handleSubmit(onSubmit)} autoComplete="off">
+					<TopicInputSearch>
+						<div className="flex w-full items-center space-x-2">
+							<div className="grow relative">
+								<Input
+									className="pr-8"
+									autoFocus
+									{...formMethods.register("query")}
+									required
 								/>
+								{!!searchInput && (
+									<div
+										className="absolute top-0 right-0 h-full flex flex-col justify-center mx-1 cursor-pointer"
+										onClick={handleClean}
+									>
+										<X
+											strokeWidth={1}
+											className="h-6 w-6 rounded-full hover:bg-orange-100 p-1"
+										/>
+									</div>
+								)}
 							</div>
-						)}
-					</div>
-					<Button type="submit" className="bg-indigo-500">
-						Search
-					</Button>
-				</div>
-				{error && (
-					<div className="p-2 text-red-600 text-sm">
-						<p>{error}</p>
-					</div>
-				)}
-			</form>
+							<Button type="submit" className="bg-indigo-500">
+								Search
+							</Button>
+						</div>
+					</TopicInputSearch>
+					{error && (
+						<div className="p-2 text-red-600 text-sm">
+							<p>{error}</p>
+						</div>
+					)}
+				</form>
+			</FormProvider>
 			<SearchIntroduction isDisplay={hasNoResults} />
 		</Tabs>
 	);
-};
-
-const getGerritAccessTokenFromCookie = async (): Promise<string | null> => {
-	const result = await chrome.cookies.getAll({
-		domain: permissionConfig.GERRIT_WEB.DOMAIN,
-		name: permissionConfig.GERRIT_WEB.COOKIE_ACCESS_TOKEN,
-	});
-	if (result && result.length > 0) {
-		return result[0].value;
-	}
-
-	return null;
 };
 
 const queryGerrit = async (

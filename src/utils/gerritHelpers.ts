@@ -1,5 +1,5 @@
 import { permissionConfig } from "../permissions";
-import { GerritChangeInfo } from "../types";
+import { GerritChangeInfo, GerritChangeInfoProjects } from "../types";
 
 export const fetchGerritChangeInfos = async (
 	accessToken: string,
@@ -29,4 +29,46 @@ export const fetchGerritChangeInfos = async (
 	}
 
 	return JSON.parse(cleanedBody);
+};
+
+/**
+ * intopic:'TOPIC'
+ * If 'TOPIC' starts with ^ it matches topic names by regular expression patterns.
+ * https://gerrit-review.googlesource.com/Documentation/user-search.html
+ * @param Changes whose designated topic contains 'TOPIC', using a full-text search.
+ */
+export const queryInTopic = (
+	accessToken: string,
+	topic: string
+): Promise<GerritChangeInfo[]> => {
+	const queryParameter = `intopic:${topic}`;
+
+	return fetchGerritChangeInfos(accessToken, queryParameter);
+};
+
+export const getGerritAccessTokenFromCookie = async (): Promise<string> => {
+	const result = await chrome.cookies.getAll({
+		domain: permissionConfig.GERRIT_WEB.DOMAIN,
+		name: permissionConfig.GERRIT_WEB.COOKIE_ACCESS_TOKEN,
+	});
+	if (result && result.length > 0) {
+		return result[0].value;
+	}
+
+	return Promise.reject();
+};
+
+export const splitGerritInfoChangesByProject = (
+	changes: GerritChangeInfo[]
+): GerritChangeInfoProjects => {
+	const changeInfoProjects: GerritChangeInfoProjects = {};
+	changes.forEach((changeInfo) => {
+		const project = changeInfoProjects[changeInfo.project];
+		if (project) {
+			project.push(changeInfo);
+		} else {
+			changeInfoProjects[changeInfo.project] = [changeInfo];
+		}
+	});
+	return changeInfoProjects;
 };

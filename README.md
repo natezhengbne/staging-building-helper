@@ -9,7 +9,7 @@ This reduces manual data entry and potential errors, improving developer efficie
 
 - Search for patches by topic/URL/CommitID on Gerrit.
   - Topic: expand-248-uk-address-lookup
-  - URL: https://gerrit.dev.benon.com/c/admin-ui/+/124403
+  - URL: `https://gerrit.dev.benon.com/c/admin-ui/+/124403`
   - CommitID(SHA): 3c7a4f7054f73659595d8b974373352aba0a7d53
 - Populate the "revisions" or "site/cluster" fields in the Cluster.pipeline page with the chosen build content.
 - Remember the most recently used site and cluster as the default for the next session.
@@ -20,7 +20,7 @@ This reduces manual data entry and potential errors, improving developer efficie
 
 ### 1.1.0
 
-- Supports searching topics using regular expressions. It equals `intopic:'TOPIC'`, see Gerrit doc here[https://gerrit-review.googlesource.com/Documentation/user-search.html]
+- Supports searching topics using regular expressions. It equals `intopic:'TOPIC'`, see Gerrit doc [here](https://gerrit-review.googlesource.com/Documentation/user-search.html)
 
 ## Limitations:
 

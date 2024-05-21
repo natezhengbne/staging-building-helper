@@ -43,11 +43,11 @@ export const SearchBar = () => {
 	};
 
 	const onSubmit: SubmitHandler<SearchForm> = async (data) => {
+		setError("");
 		if (data.query === "111" && import.meta.env.MODE === "development") {
 			setChangeInfoProjects(gerritChangeInfos);
 			return;
 		}
-		setError("");
 		const accessToken = await getGerritAccessTokenFromCookie().catch(() => {
 			setError(<GerritTokenUnreachable />);
 		});
@@ -56,21 +56,24 @@ export const SearchBar = () => {
 			return;
 		}
 
-		let changeInfos: GerritChangeInfo[] = [];
 		try {
-			changeInfos = await queryGerrit(accessToken, data.query, activeTab);
+			const param = buildGerritQueryParameter(data.query, activeTab);
+			const changeInfos: GerritChangeInfo[] = await fetchGerritChangeInfos(
+				accessToken,
+				param
+			);
+
+			if (changeInfos && changeInfos.length > 0) {
+				setChangeInfoProjects(changeInfos);
+			} else {
+				setError("No Gerrit patches match your search");
+			}
 		} catch (e) {
 			if (e instanceof Error) {
 				setError(e.message);
 			} else {
 				setError("No Gerrit patches match your search");
 			}
-		}
-
-		if (changeInfos && changeInfos.length > 0) {
-			setChangeInfoProjects(changeInfos);
-		} else {
-			setError("No Gerrit patches match your search");
 		}
 	};
 
@@ -133,7 +136,7 @@ export const SearchBar = () => {
 						</div>
 					</TopicInputSearch>
 					{error && (
-						<div className="p-2 text-red-600 text-sm">
+						<div className="p-1 text-red-600 text-xs">
 							<p>{error}</p>
 						</div>
 					)}
@@ -144,11 +147,10 @@ export const SearchBar = () => {
 	);
 };
 
-const queryGerrit = async (
-	accessToken: string,
+const buildGerritQueryParameter = (
 	queryContent: string,
 	type: SearchType
-): Promise<GerritChangeInfo[]> => {
+): string => {
 	let gerritQueryParameter = "";
 
 	if (type === "topic") {
@@ -166,7 +168,7 @@ const queryGerrit = async (
 					gerritQueryParameter = `change:${idNumber}`;
 				}
 			} else {
-				return Promise.reject(new Error("The Gerrit patch URL is invalid"));
+				throw new Error("The Gerrit patch URL is invalid");
 			}
 		} catch (e) {
 			// handle SHA: 3c7a4f7054f73659595d8b974373352aba0a7d53
@@ -176,10 +178,10 @@ const queryGerrit = async (
 	}
 
 	if (!gerritQueryParameter) {
-		return Promise.reject(new Error("Query parameter is invalid"));
+		throw new Error("Query parameter is invalid");
 	}
 
-	return await fetchGerritChangeInfos(accessToken, gerritQueryParameter);
+	return gerritQueryParameter;
 };
 
 const SearchIntroduction = ({ isDisplay }: { isDisplay: boolean }) => {

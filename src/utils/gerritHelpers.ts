@@ -12,23 +12,29 @@ export const fetchGerritChangeInfos = async (
 		access_token: accessToken,
 	});
 
-	const response = await fetch(
-		`${permissionConfig.GERRIT_API.REST_CHANGES}?${params}`
-	);
-
-	if (!response.ok) {
-		return Promise.reject(new Error(`Query failed: ${response.status}`));
-	}
-
-	const body = await response.text();
-	const cleanedBody = body.replace(")]}'", "");
-	if (!cleanedBody || cleanedBody === "[]") {
-		return Promise.reject(
-			new Error("No patches match your search or Gerrit login session expired")
+	try {
+		const response = await fetch(
+			`${permissionConfig.GERRIT_API.REST_CHANGES}?${params}`
 		);
-	}
 
-	return JSON.parse(cleanedBody);
+		if (!response.ok) {
+			return Promise.reject(new Error(`Query failed: ${response.status}`));
+		}
+
+		const body = await response.text();
+		const cleanedBody = body.replace(")]}'", "");
+		if (!cleanedBody || cleanedBody === "[]") {
+			return Promise.reject(
+				new Error(
+					"No patches match your search or Gerrit login session expired"
+				)
+			);
+		}
+
+		return JSON.parse(cleanedBody);
+	} catch (_) {
+		return Promise.reject(new Error("Gerrit Rest API is unreachable"));
+	}
 };
 
 /**

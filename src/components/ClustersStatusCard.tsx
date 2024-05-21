@@ -100,15 +100,16 @@ const StagingRefreshingStatus = () => {
 	const [error, setError] = useState("");
 
 	const handleRefresh = useCallback(async () => {
-		const tab = await getServiceStatusPageTab();
+		const tab = await getServiceStatusPageTab().catch(() => null);
 		if (!tab || !tab.id) {
 			setError(
 				"You need to open the service-status page to obtain access authorization"
 			);
 			return;
 		}
-
-		const token = await getAuthenticationsFromServiceStatus(tab.id);
+		const token = await getAuthenticationsFromServiceStatus(tab.id).catch(
+			() => null
+		);
 		if (!token) {
 			setError("You need to login service-status.");
 			return;
@@ -116,7 +117,12 @@ const StagingRefreshingStatus = () => {
 
 		setError("");
 		setIsRefreshing(true);
-		const clustersStatus = await queryClustersStatus(token);
+		const clustersStatus = await queryClustersStatus(token).catch(() => null);
+		if (!clustersStatus) {
+			setIsRefreshing(true);
+			return;
+		}
+
 		setUnavailableClusters(new Set(""));
 
 		clustersStatus.forEach((staging) => {
@@ -154,7 +160,11 @@ const StagingRefreshingStatus = () => {
 							? "animate-spin size-4 cursor-wait"
 							: "size-4 cursor-pointer"
 					}
-					onClick={() => !isRefreshing && handleRefresh()}
+					onClick={() => {
+						if (!isRefreshing) {
+							handleRefresh();
+						}
+					}}
 				/>
 			</div>
 			{error && (
@@ -167,14 +177,13 @@ const StagingRefreshingStatus = () => {
 };
 
 const getAuthenticationsFromServiceStatus = async (tabId: number) => {
-	const [scriptResult] = await chrome.scripting.executeScript({
-		target: { tabId },
-		func: () => {
-			return window.localStorage.authentications;
-		},
-	});
-
 	try {
+		const [scriptResult] = await chrome.scripting.executeScript({
+			target: { tabId },
+			func: () => {
+				return window.localStorage.authentications;
+			},
+		});
 		const authentications = JSON.parse(
 			scriptResult.result
 		) as ServiceStatusSiteAuthentication[];
@@ -198,6 +207,8 @@ const queryClustersStatus = async (
 			Authorization: `Bearer ${token}`,
 		},
 	});
+
+	console.log(response);
 
 	if (!response.ok) {
 		return Promise.reject();

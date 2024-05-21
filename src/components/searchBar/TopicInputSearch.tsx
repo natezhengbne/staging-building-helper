@@ -44,18 +44,20 @@ export const TopicInputSearch: FC<PropsWithChildren> = ({ children }) => {
 			) {
 				return;
 			}
-			queryInTopic(gerritAccessToken, inputValue).then((changes) => {
-				setChangeInfoResults(changes);
-				const topics = new Set<string>();
-				changes.forEach((change) => {
-					if (change.topic) {
-						topics.add(change.topic);
+			queryInTopic(gerritAccessToken, inputValue)
+				.then((changes) => {
+					setChangeInfoResults(changes);
+					const topics = new Set<string>();
+					changes.forEach((change) => {
+						if (change.topic) {
+							topics.add(change.topic);
+						}
+					});
+					if (topics.size > 1) {
+						setTopicResults(Array.from(topics));
 					}
-				});
-				if (topics.size > 1) {
-					setTopicResults(Array.from(topics));
-				}
-			});
+				})
+				.catch(() => null);
 		},
 		[inputValue],
 		{

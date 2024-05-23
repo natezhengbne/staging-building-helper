@@ -3,7 +3,7 @@ import { GerritChangeInfo, GerritChangeInfoProjects, JenkinsBuildInfo } from "@/
 export const gerritChangeInfos: GerritChangeInfo[] = [
 	{
 		current_revision: "1111111111",
-		project: "webui",
+		project: "web",
 		subject: "USER-1976 Duplicate location is displayed in address card",
 		branch: "master",
 		status: "Merged",
@@ -15,7 +15,7 @@ export const gerritChangeInfos: GerritChangeInfo[] = [
 	},
 	{
 		current_revision: "22222222",
-		project: "webui",
+		project: "web",
 		subject: "USER-1972 JumboWin incorrectly highlighting optional field",
 		branch: "master",
 		revisions: {

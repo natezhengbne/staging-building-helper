@@ -20,5 +20,5 @@ export const gerritProjectJenkinsImageFieldNameMapping: { [project: string]: str
 		"kafka-topics": "KAFKA_TOPICS_IMAGE_TAG",
 		"msg-filestore": "MSG_FILESTORE_IMAGE_TAG",
 		ruth: "RUTH_IMAGE_TAG",
-		webui: "WEBUI_IMAGE_TAG",
+		web: "WEBUI_IMAGE_TAG",
 	};

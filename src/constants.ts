@@ -14,7 +14,7 @@ export const gerritProjectJenkinsImageFieldNameMapping: { [project: string]: str
 		emailcms: "EMAILCMS_IMAGE_TAG",
 		emailrelay: "EMAILREPAY_IMAGE_TAG",
 		hermes: "HERMES_IMAGE_TAG",
-		jl: "JL_CMD_IMAGE_TAG",
+		jl: "JL_IMAGE_TAG",
 		"jl-db-update": "JL_DB_UPDATE_IMAGE_TAG",
 		"cp-kafka": "KAFKA_IMAGE_TAG",
 		"kafka-topics": "KAFKA_TOPICS_IMAGE_TAG",

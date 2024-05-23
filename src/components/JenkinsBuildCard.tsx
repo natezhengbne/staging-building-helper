@@ -1,6 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import {
-	
+import {	
 	changeInfosDisplayAtom,
 	clearChangeInfosAndSelectedRevisionsAtom,
 	jenkinsBuildInfoAtom,

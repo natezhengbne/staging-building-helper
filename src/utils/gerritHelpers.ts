@@ -1,5 +1,11 @@
 import { permissionConfig } from "../permissions";
-import { GerritChangeInfo, GerritChangeInfoProjects } from "../types";
+import {
+	GerritAccount,
+	GerritChangeInfo,
+	GerritChangeInfoProjects,
+} from "../types";
+
+const getCleanBody = (body: string): string => body.replace(")]}'", "");
 
 export const fetchGerritChangeInfos = async (
 	accessToken: string,
@@ -22,7 +28,7 @@ export const fetchGerritChangeInfos = async (
 		}
 
 		const body = await response.text();
-		const cleanedBody = body.replace(")]}'", "");
+		const cleanedBody = getCleanBody(body);
 		if (!cleanedBody || cleanedBody === "[]") {
 			return Promise.reject(
 				new Error(
@@ -77,4 +83,21 @@ export const splitGerritInfoChangesByProject = (
 		}
 	});
 	return changeInfoProjects;
+};
+
+export const querySelfAccount = async(
+	accessToken: string
+): Promise<GerritAccount> => {
+
+	const params = new URLSearchParams({
+		access_token: accessToken,
+	});
+
+	const response = await fetch(
+		`${permissionConfig.GERRIT_API.REST_ACCOUNTs}/self?${params}`
+	);
+	const body = await response.text();
+	const cleanedBody = getCleanBody(body);
+
+	return JSON.parse(cleanedBody);
 };

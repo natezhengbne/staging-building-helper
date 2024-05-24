@@ -1,7 +1,10 @@
 import { GerritChangeInfo } from "@/src/types";
 import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
-import { useAtom } from "jotai";
-import { changeInfosDisplayAtom } from "@/src/store";
+import { useAtom, useSetAtom } from "jotai";
+import {
+	changeInfosDisplayAtom,
+	derivedServicesConnectionAtom,
+} from "@/src/store";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { gerritChangeInfos } from "../fixture";
@@ -32,7 +35,7 @@ export const SearchBar = () => {
 		changeInfosDisplayAtom
 	);
 	const [activeTab, setActiveTab] = useState<SearchType>("topic");
-
+	const updateConnection = useSetAtom(derivedServicesConnectionAtom);
 	const [error, setError] = useState<string | React.ReactNode>("");
 	const hasNoResults =
 		!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0;
@@ -62,7 +65,7 @@ export const SearchBar = () => {
 				accessToken,
 				param
 			);
-
+			updateConnection("gerrit");
 			if (changeInfos && changeInfos.length > 0) {
 				setChangeInfoProjects(changeInfos);
 			} else {

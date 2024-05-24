@@ -5,6 +5,8 @@ import {
 	JenkinsBuildInfo,
 	JenkinsImageTag,
 	SelectedRevisions,
+	ServiceConnection,
+	ServiceType,
 	UnavailableClusters,
 } from "@/src/types";
 import { atomWithReset } from "jotai/utils";
@@ -28,7 +30,7 @@ export const clearChangeInfosAndSelectedRevisionsAtom = atom(null, (_, set) => {
 });
 
 /**
- * User interactive data storage
+ * User interactive data storage - START
  */
 // For Jenkins form
 export const selectedRevisionsAtom = atomWithReset<SelectedRevisions>({});
@@ -73,8 +75,19 @@ export const stagingsStatusLastRefreshTimeAtom = atom<Date | undefined>(
 	undefined
 );
 /**
- * END
+ * User interactive data storage - END
  */
 
-
-
+const servicesConnectionAtom = atom<ServiceConnection>({});
+export const derivedServicesConnectionAtom = atom(
+	(get) => get(servicesConnectionAtom),
+	(get, set, service: ServiceType, available?: boolean) => {
+		set(servicesConnectionAtom, {
+			...get(servicesConnectionAtom),
+			[service]: {
+				refreshedAt: new Date(),
+				available,
+			},
+		});
+	}
+);

@@ -20,7 +20,8 @@
         "ORIGIN_HTTPS": "https://gerrit.dev.benon.com"
     },
     "GERRIT_API": {
-        "REST_CHANGES": "https://gerrit.dev.benon.com/changes"
+        "REST_CHANGES": "https://gerrit.dev.benon.com/changes",
+        "REST_ACCOUNTs": "https://gerrit.dev.benon.com/accounts"
     },
     "JENKINS": {
         "CLUSTER_PIPELINE_SITE": "https://build.dev.benon.com/view/Cluster/job/cluster.pipeline/build"

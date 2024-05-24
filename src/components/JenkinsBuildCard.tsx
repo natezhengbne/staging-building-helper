@@ -1,7 +1,8 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import {	
+import {
 	changeInfosDisplayAtom,
 	clearChangeInfosAndSelectedRevisionsAtom,
+	derivedServicesConnectionAtom,
 	jenkinsBuildInfoAtom,
 	selectedRevisionsAtom,
 } from "@/src/store";
@@ -23,6 +24,7 @@ export const JenkinsBuildCard = () => {
 	const clearChangeInfosAndSelectedRevisions = useSetAtom(
 		clearChangeInfosAndSelectedRevisionsAtom
 	);
+	const updateConnection = useSetAtom(derivedServicesConnectionAtom);
 
 	const jenkinsBuildInfo = useAtomValue(jenkinsBuildInfoAtom);
 	const [error, setError] = useState<string | React.ReactNode>("");
@@ -45,7 +47,7 @@ export const JenkinsBuildCard = () => {
 			);
 			return;
 		}
-
+		updateConnection("jenkins");
 		const [logoutComponent] = await chrome.scripting.executeScript({
 			target: { tabId: jenkinsTab.id },
 			func: () => {

@@ -29,6 +29,10 @@ export type GerritChangeInfoProjects = {
 	[project: string]: GerritChangeInfo[];
 };
 
+export type GerritAccount = {
+	username: string;
+};
+
 export type SelectedRevisions = {
 	[project: string]: string;
 };
@@ -61,4 +65,12 @@ export type StagingsClusterStatus = {
 			expires: string; // 2024-05-04T04:01:27+10:00
 		},
 	];
+};
+
+export type ServiceType = "jenkins" | "gerrit" | "staging";
+export type ServiceConnection = {
+	[service in ServiceType]?: {
+		refreshedAt: Date;
+		available: boolean;
+	};
 };

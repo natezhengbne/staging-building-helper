@@ -53,8 +53,11 @@ export const TopicInputSearch: FC<PropsWithChildren> = ({ children }) => {
 							topics.add(change.topic);
 						}
 					});
+
 					if (topics.size > 1) {
 						setTopicResults(Array.from(topics));
+					} else if (topics.size === 1) {
+						handleTopicClick(Array.from(topics)[0]);
 					}
 				})
 				.catch(() => null);

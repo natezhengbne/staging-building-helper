@@ -86,7 +86,7 @@ export const TopicInputSearch: FC<PropsWithChildren> = ({ children }) => {
 						className="text-xs cursor-pointer hover:underline"
 						onClick={() => handleTopicClick(topic)}
 					>
-						{topic}
+						{`#${topic}`}
 					</li>
 				))}
 			</ul>

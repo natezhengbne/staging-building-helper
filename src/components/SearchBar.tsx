@@ -1,7 +1,8 @@
 import { GerritChangeInfo } from "@/src/types";
 import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
+	changeInfoRefreshedAtAtom,
 	changeInfosDisplayAtom,
 	derivedServicesConnectionAtom,
 } from "@/src/store";
@@ -20,6 +21,7 @@ import {
 } from "../utils/gerritHelpers";
 import { TopicInputSearch } from "./searchBar/TopicInputSearch";
 import { ComponentEvent } from "../constants";
+import dayjs from "dayjs";
 
 type SearchType = "topic" | "revision";
 
@@ -34,6 +36,7 @@ export const SearchBar = () => {
 	const [changeInfoProjects, setChangeInfoProjects] = useAtom(
 		changeInfosDisplayAtom
 	);
+	const changeInfoRefreshedAt = useAtomValue(changeInfoRefreshedAtAtom);
 	const [activeTab, setActiveTab] = useState<SearchType>("topic");
 	const updateConnection = useSetAtom(derivedServicesConnectionAtom);
 	const [error, setError] = useState<string | React.ReactNode>("");
@@ -137,6 +140,9 @@ export const SearchBar = () => {
 								Search
 							</Button>
 						</div>
+						{changeInfoRefreshedAt && (
+							<p className="px-2 text-xs text-muted-foreground font-mono">{`search at: ${dayjs(changeInfoRefreshedAt).format("DDMMM HH:mm:ss")}`}</p>
+						)}
 					</TopicInputSearch>
 					{error && (
 						<div className="p-1 text-red-600 text-xs">

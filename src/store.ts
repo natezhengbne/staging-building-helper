@@ -15,6 +15,7 @@ import { gerritProjectJenkinsImageFieldNameMapping } from "./constants";
 
 // GerritChangeInfoProjects storage
 const changeInfoProjectsAtom = atomWithReset<GerritChangeInfoProjects>({});
+export const changeInfoRefreshedAtAtom = atom<Date | null>(null);
 export const changeInfosDisplayAtom = atom(
 	(get) => get(changeInfoProjectsAtom),
 	(_, set, changeInfos: GerritChangeInfo[]) => {
@@ -22,11 +23,13 @@ export const changeInfosDisplayAtom = atom(
 			splitGerritInfoChangesByProject(changeInfos);
 		set(changeInfoProjectsAtom, changeInfoProjects);
 		set(selectedRevisionsAtom, {});
+		set(changeInfoRefreshedAtAtom, new Date());
 	}
 );
 export const clearChangeInfosAndSelectedRevisionsAtom = atom(null, (_, set) => {
 	set(changeInfoProjectsAtom, {});
 	set(selectedRevisionsAtom, {});
+	set(changeInfoRefreshedAtAtom, null);
 });
 
 /**

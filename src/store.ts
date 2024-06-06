@@ -4,6 +4,7 @@ import {
 	GerritChangeInfoProjects,
 	JenkinsBuildInfo,
 	JenkinsImageTag,
+	JenkinsTimeout,
 	SelectedRevisions,
 	ServiceConnection,
 	ServiceType,
@@ -40,6 +41,8 @@ export const selectedRevisionsAtom = atomWithReset<SelectedRevisions>({});
 export const selectedSiteAtom = atom<string>("");
 export const selectedClusterNameAtom = atom<string>("");
 export const selectedClusterIdAtom = atom<string>("");
+export const clusterMoreParametersSwitchAtom = atom<boolean>(false);
+export const clusterTimeoutAtom = atom<JenkinsTimeout | undefined>(undefined);
 export const jenkinsBuildInfoAtom = atom<JenkinsBuildInfo>((get) => {
 	const selectedRevisions = get(selectedRevisionsAtom);
 	const imageTags: JenkinsImageTag[] = Object.keys(selectedRevisions).map(
@@ -61,11 +64,16 @@ export const jenkinsBuildInfoAtom = atom<JenkinsBuildInfo>((get) => {
 		selectedClusterName && selectedClusterId
 			? selectedClusterName.concat(selectedClusterId)
 			: "";
+	const isMoreParametersSwitchOn = !!get(clusterMoreParametersSwitchAtom);
+	const timeout = isMoreParametersSwitchOn
+		? get(clusterTimeoutAtom)
+		: undefined;
 
 	return {
 		imageTags,
 		site: selectedSite,
 		cluster,
+		timeout,
 	};
 });
 

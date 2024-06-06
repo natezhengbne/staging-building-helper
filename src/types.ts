@@ -42,10 +42,16 @@ export type JenkinsImageTag = {
 	tag: string;
 };
 
+export type JenkinsTimeout = {
+	hours: string;
+	reason: string;
+};
+
 export type JenkinsBuildInfo = {
 	site?: string;
 	cluster?: string;
 	imageTags: JenkinsImageTag[];
+	timeout?: JenkinsTimeout;
 };
 
 // ["Staging1", "rocket1"]

@@ -18,6 +18,7 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { permissionConfig } from "@/src/permissions";
 import { ComponentEvent } from "../constants";
+import { MoreParameters } from "./JenkinsMoreParameters";
 
 export const JenkinsBuildCard = () => {
 	const projects = useAtomValue(changeInfosDisplayAtom);
@@ -95,6 +96,8 @@ export const JenkinsBuildCard = () => {
 			<SiteCard />
 			<Separator className="my-3" />
 			<ClusterStatusCard />
+			<Separator className="my-3" />
+			<MoreParameters />
 			<div className="mt-4 flex justify-end gap-4">
 				<Button size="sm" className="bg-indigo-500" onClick={handlePrefill}>
 					Prefill
@@ -225,6 +228,11 @@ const runPopulateFieldsScripts = (jenkinsBuildInfo: JenkinsBuildInfo) => {
 
 	if (jenkinsBuildInfo.cluster) {
 		populateInputField("CLUSTER_NAME", jenkinsBuildInfo.cluster);
+	}
+
+	if (jenkinsBuildInfo.timeout) {
+		populateInputField("CLUSTER_TIMEOUT_HRS", jenkinsBuildInfo.timeout.hours);
+		populateInputField("CLUSTER_TIMEOUT_REASON", jenkinsBuildInfo.timeout.reason);
 	}
 };
 

@@ -43,10 +43,10 @@ export const SearchBar = () => {
 	const hasNoResults =
 		!changeInfoProjects || Object.keys(changeInfoProjects).length <= 0;
 
-	const handleClean = () => {
+	const handleClean = useCallback(() => {
 		formMethods.reset();
 		setError("");
-	};
+	}, [formMethods, setError]);
 
 	const onSubmit: SubmitHandler<SearchForm> = async (data) => {
 		setError("");
@@ -83,16 +83,12 @@ export const SearchBar = () => {
 		}
 	};
 
-	const handleClearAll = useCallback(() => {
-		formMethods.reset();
-	}, [formMethods]);
-
 	useEffect(() => {
-		window.addEventListener(ComponentEvent.ClearAll, handleClearAll);
+		window.addEventListener(ComponentEvent.ClearAll, handleClean);
 		return () => {
-			window.removeEventListener(ComponentEvent.ClearAll, handleClearAll);
+			window.removeEventListener(ComponentEvent.ClearAll, handleClean);
 		};
-	}, [handleClearAll]);
+	}, [handleClean]);
 
 	return (
 		<Tabs

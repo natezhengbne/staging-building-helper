@@ -169,6 +169,7 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 		dayjs(created).add(dayjs().utcOffset(), "m").format("DDMMM HH:mm");
 
 	const isCiPassed = isCommitCiVerified(changeInfo);
+	const isMerged = changeInfo.status === "MERGED";
 
 	return (
 		<div className="items-top flex space-x-2">
@@ -191,7 +192,10 @@ const ChangeInfoItem = (props: ChangeInfoItemProps) => {
 						</p>
 					</div>
 					<div className="flex gap-1 items-center">
-						{isCiPassed && (
+						{isMerged && (
+							<p className="text-xs text-red-500 font-medium">MERGED</p>
+						)}
+						{isCiPassed && !isMerged && (
 							<p className="text-xs text-green-500 font-medium">CI</p>
 						)}
 						<Separator orientation="vertical" />
@@ -232,7 +236,10 @@ const runPopulateFieldsScripts = (jenkinsBuildInfo: JenkinsBuildInfo) => {
 
 	if (jenkinsBuildInfo.timeout) {
 		populateInputField("CLUSTER_TIMEOUT_HRS", jenkinsBuildInfo.timeout.hours);
-		populateInputField("CLUSTER_TIMEOUT_REASON", jenkinsBuildInfo.timeout.reason);
+		populateInputField(
+			"CLUSTER_TIMEOUT_REASON",
+			jenkinsBuildInfo.timeout.reason
+		);
 	}
 };
 

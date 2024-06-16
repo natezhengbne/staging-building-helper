@@ -7,7 +7,7 @@ function App() {
 		<div className="w-screen max-w-screen-md p-2 bg-amber-50">
 			<SearchBar />
 			<JenkinsBuildCard />
-			<Footer />
+			{/* <Footer /> */}
 		</div>
 	);
 }

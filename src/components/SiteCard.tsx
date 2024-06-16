@@ -75,7 +75,7 @@ const primarySiteTypes = [
 	"ozl",
 	"jumbowin",
 	"mater",
-	"lotteryest",
+	"lotterywest",
 	"endeavour",
 	"playjumbo",
 ];
